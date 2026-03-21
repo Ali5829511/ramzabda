@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#F59E0B" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="رمز الإبداع" />
+    <link rel="apple-touch-icon" href="/logo.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/logo.png" />
+    <meta name="msapplication-TileImage" content="/logo.png" />
+    <meta name="msapplication-TileColor" content="#F59E0B" />
+    <meta name="description" content="منصة رمز الإبداع — نظام إدارة الأملاك والصيانة والتسويق العقاري المتكامل" />
+    <meta property="og:title" content="رمز الإبداع لإدارة الأملاك" />
+    <meta property="og:description" content="منصة تشغيل عقاري متكاملة" />
+    <meta property="og:image" content="/logo.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>رمز الإبداع لإدارة الأملاك</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ===== PRINT SYSTEM ===== */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 12mm 15mm 18mm 15mm;
+      }
+      @page :first { margin-top: 0; }
+
+      /* Hide everything except print target */
+      body * { visibility: hidden !important; }
+      #ramz-print-root,
+      #ramz-print-root * { visibility: visible !important; }
+      #ramz-print-root {
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: 99999 !important;
+        background: white !important;
+      }
+
+      /* No page break inside table rows */
+      tr { page-break-inside: avoid; }
+      .no-break { page-break-inside: avoid; }
+
+      /* Hide print button itself */
+      .print-hide { display: none !important; }
+    }
+  </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
