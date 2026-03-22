@@ -4,7 +4,9 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci
+# Install ALL dependencies (including devDependencies such as vite and
+# typescript) regardless of NODE_ENV so the build tools are available.
+RUN npm ci --include=dev
 
 COPY . .
 
