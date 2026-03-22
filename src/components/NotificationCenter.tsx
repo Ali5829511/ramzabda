@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { useStore, generateId } from '../data/store';
+import { useStore } from '../data/store';
 import {
   Bell, X, CheckCheck, AlertCircle, AlertTriangle, Info,
-  FileText, Wrench, DollarSign, Calendar, Users, Filter,
-  Trash2, RefreshCw, CheckCircle, Clock, Volume2, VolumeX
+  FileText, Wrench, DollarSign, Calendar,
+  Trash2, CheckCircle, Volume2, VolumeX
 } from 'lucide-react';
 
 type AlertCategory = 'all' | 'contract' | 'invoice' | 'maintenance' | 'appointment' | 'system';
@@ -19,16 +19,21 @@ interface SmartAlert {
   actionPage?: string;
 }
 
+interface ContractLike { id: string; status: string; endDate?: string; contractNumber: string; tenantName?: string; }
+interface InvoiceLike { id: string; invoiceStatus: string; remainingAmount: number; invoiceNumber: string; invoiceGraceDate?: string; totalAmount: number; }
+interface MaintenanceLike { id: string; priority: string; status: string; title: string; createdAt?: string; }
+interface AppointmentLike { id: string; status: string; date: string; type: string; time?: string; }
+
 function buildSmartAlerts(
-  contracts: any[], invoices: any[], maintenanceRequests: any[], appointments: any[]
+  contracts: ContractLike[], invoices: InvoiceLike[], maintenanceRequests: MaintenanceLike[], appointments: AppointmentLike[]
 ): SmartAlert[] {
   const alerts: SmartAlert[] = [];
   const today = new Date();
   const fmt = (d: Date) => d.toISOString().slice(0, 10);
 
   // Expiring contracts
-  contracts.filter(c => c.status === 'active').forEach(c => {
-    const end = new Date(c.endDate);
+  contracts.filter(c => c.status === 'active' && c.endDate).forEach(c => {
+    const end = new Date(c.endDate!);
     const days = Math.round((end.getTime() - today.getTime()) / 86400000);
     if (days < 0) {
       alerts.push({ id: `ce-${c.id}`, type: 'danger', category: 'contract', isRead: false,
@@ -91,7 +96,7 @@ interface Props {
 }
 
 export default function NotificationCenter({ onNavigate }: Props) {
-  const { contracts, invoices, maintenanceRequests, appointments, notifications, markNotificationRead, addNotification } = useStore();
+  const { contracts, invoices, maintenanceRequests, appointments } = useStore();
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState<AlertCategory>('all');
   const [soundEnabled, setSoundEnabled] = useState(true);

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useStore } from '../data/store';
 import type { AppState } from '../data/store';
-import { Bot, X, Send, Minimize2, Maximize2, Sparkles, RefreshCw } from 'lucide-react';
+import { Bot, X, Send, Minimize2, Maximize2, Sparkles } from 'lucide-react';
 
 interface Message {
   id: string;

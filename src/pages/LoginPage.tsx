@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useStore } from '../data/store';
-import { Building2, Lock, Eye, EyeOff, User, Shield, ChevronRight, Sparkles } from 'lucide-react';
+import { Lock, Eye, EyeOff, User, Shield, ChevronRight, Sparkles } from 'lucide-react';
 
 const roleConfig: Record<string, { label: string; color: string; bg: string; border: string; icon: string; desc: string }> = {
   admin:      { label: 'المدير العام',    color: 'text-purple-700', bg: 'bg-purple-50',  border: 'border-purple-200', icon: '👑', desc: 'صلاحيات كاملة لجميع العمليات' },
@@ -85,7 +85,7 @@ export default function LoginPage() {
                 { id: 'login', label: 'تسجيل الدخول', icon: <Lock className="w-4 h-4" /> },
                 { id: 'quick', label: 'دخول سريع', icon: <Sparkles className="w-4 h-4" /> },
               ].map(t => (
-                <button key={t.id} onClick={() => setActiveTab(t.id as any)}
+                <button key={t.id} onClick={() => setActiveTab(t.id as 'login' | 'quick')}
                   className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-semibold transition-colors ${activeTab === t.id ? 'text-yellow-600 border-b-2 border-yellow-500 bg-yellow-50/50' : 'text-gray-400 hover:text-gray-600'}`}>
                   {t.icon} {t.label}
                 </button>
