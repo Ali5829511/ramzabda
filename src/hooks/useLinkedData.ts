@@ -147,7 +147,7 @@ export function useSmartAlerts() {
     });
 
     // Sort: danger first
-    return list.sort((a) => (a.type === 'danger' ? -1 : 1));
+    return list.sort((a, b) => (b.type === 'danger' ? 1 : 0) - (a.type === 'danger' ? 1 : 0));
   }, [contracts, invoices, installments, maintenanceRequests]);
 
   return alerts;
