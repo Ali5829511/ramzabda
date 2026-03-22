@@ -1,0 +1,6 @@
+# nixpacks.toml – Railway Nixpacks build configuration
+# Force Nixpacks to install ALL dependencies (including devDependencies such as
+# vite, typescript, and @types/*) regardless of NODE_ENV, because the build
+# step requires these tools even in a production environment.
+[phases.install]
+cmds = ["npm ci --include=dev"]
