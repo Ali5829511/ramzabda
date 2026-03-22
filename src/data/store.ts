@@ -224,7 +224,7 @@ export const useStore = create<AppState>()(
       deleteAdLicense: (id) => { set(s => ({ adLicenses: s.adLicenses.filter(l => l.id !== id) })); syncDelete('ad_licenses', id); },
 
       addSupportTicket: (t) => { set(s => ({ supportTickets: [...s.supportTickets, t] })); syncUpsert('support_tickets', t); },
-      updateSupportTicket: (id: string, data: any) => { set(s => ({ supportTickets: s.supportTickets.map(t => t.id === id ? { ...t, ...data } : t) })); const updated = get().supportTickets.find(t => t.id === id); if (updated) syncUpsert('support_tickets', updated); },
+      updateSupportTicket: (id: string, data: Partial<SupportTicket>) => { set(s => ({ supportTickets: s.supportTickets.map(t => t.id === id ? { ...t, ...data } : t) })); const updated = get().supportTickets.find(t => t.id === id); if (updated) syncUpsert('support_tickets', updated); },
       deleteSupportTicket: (id: string) => { set(s => ({ supportTickets: s.supportTickets.filter(t => t.id !== id) })); syncDelete('support_tickets', id); },
 
       addUser: (u) => { set(s => ({ users: [...s.users, u] })); syncUpsert('users', u); },

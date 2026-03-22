@@ -9,9 +9,16 @@
  *   • When Supabase env vars are absent → silently skip (localStorage only).
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { supabase } from './supabase';
 
-// ─── table name mapping ───────────────────────────────────────
+// ─── types ────────────────────────────────────────────────────
+interface DbRow {
+  data: unknown;
+}
+
+
 export type DbTable =
   | 'users'
   | 'properties'
@@ -80,7 +87,7 @@ export async function loadAllFromSupabase(): Promise<SupabaseSnapshot | null> {
       ALL_TABLES.map(table =>
         supabase.from(table).select('data').then(({ data, error }) => {
           if (error) throw new Error(`[supabaseSync] ${table}: ${error.message}`);
-          return { table, rows: (data ?? []).map((r: { data: unknown }) => r.data) };
+          return { table, rows: (data ?? []).map((r: DbRow) => r.data) };
         })
       )
     );
