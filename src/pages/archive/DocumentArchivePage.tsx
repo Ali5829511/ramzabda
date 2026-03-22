@@ -1,9 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { useStore, generateId } from '../../data/store';
 import {
-  Archive, Upload, Search, Filter, File, FileText, Image, Download,
-  Trash2, Eye, FolderOpen, Plus, Tag, Calendar, Building2,
-  AlertCircle, CheckCircle, Clock, ExternalLink, ChevronDown
+  Archive, Upload, Search,
+  Trash2, Eye, FolderOpen, Plus, Calendar,
+  AlertCircle, Clock,
 } from 'lucide-react';
 
 interface Document {
@@ -49,21 +49,21 @@ export default function DocumentArchivePage() {
   const [form, setForm] = useState({ name: '', type: 'other', propertyId: '', contractId: '', expiresAt: '', notes: '', tags: '' });
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
+  const in90Days = useMemo(() => new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10), []);
 
   const filtered = docs.filter(d => {
     const q = search.toLowerCase();
     return (
       (!q || d.name.toLowerCase().includes(q) || d.tags.some(t => t.includes(q))) &&
       (!filterType || d.type === filterType) &&
-      (!filterExpiry || (filterExpiry === 'expired' ? (d.expiresAt ?? '9999') < today : filterExpiry === 'expiring' ? (d.expiresAt ?? '9999') < new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10) && (d.expiresAt ?? '') >= today : true))
+      (!filterExpiry || (filterExpiry === 'expired' ? (d.expiresAt ?? '9999') < today : filterExpiry === 'expiring' ? (d.expiresAt ?? '9999') < in90Days && (d.expiresAt ?? '') >= today : true))
     );
   });
 
   const expiredCount = docs.filter(d => d.expiresAt && d.expiresAt < today).length;
   const expiringCount = docs.filter(d => {
-    const in90 = new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10);
-    return d.expiresAt && d.expiresAt >= today && d.expiresAt < in90;
+    return d.expiresAt && d.expiresAt >= today && d.expiresAt < in90Days;
   }).length;
 
   const addDoc = () => {
@@ -169,7 +169,7 @@ export default function DocumentArchivePage() {
           ) : filtered.map(doc => {
             const cfg = TYPE_CONFIG[doc.type];
             const isExpired = doc.expiresAt && doc.expiresAt < today;
-            const isExpiring = !isExpired && doc.expiresAt && doc.expiresAt < new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10);
+            const isExpiring = !isExpired && doc.expiresAt && doc.expiresAt < in90Days;
             return (
               <div key={doc.id} className="flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 ${cfg.color}`}>

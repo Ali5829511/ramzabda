@@ -25,6 +25,8 @@ interface FormState {
   brokerageAgreementNumber: string;
 }
 
+const getDaysLeft = (endDate: string) => Math.ceil((new Date(endDate).getTime() - Date.now()) / 86400000);
+
 export default function ContractsPage() {
   const { contracts, units, properties, users, invoices, addContract, updateContract, currentUser } = useStore();
   const [showForm, setShowForm] = useState(false);
@@ -137,8 +139,6 @@ export default function ContractsPage() {
     setShowForm(false);
     resetForm();
   };
-
-  const getDaysLeft = (endDate: string) => Math.ceil((new Date(endDate).getTime() - Date.now()) / 86400000);
 
   return (
     <div className="space-y-6">
