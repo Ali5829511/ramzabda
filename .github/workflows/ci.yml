@@ -23,7 +23,7 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --include=dev
 
       - name: Lint
         # continue-on-error is set because the codebase has pre-existing lint
