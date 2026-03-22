@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useStore } from '../../data/store';
+import type { MaintenanceRequest } from '../../types';
 import {
-  Wrench, Clock, CheckCircle, AlertCircle, Camera, Send,
-  MapPin, Phone, Star, ChevronRight, Eye, Filter,
-  Calendar, DollarSign, Upload, X, Play, Square
+  Wrench, Clock, CheckCircle, AlertCircle,
+  MapPin, Star, Eye,
+  Play
 } from 'lucide-react';
 
-const STATUS_STEPS = ['new', 'assigned', 'in_progress', 'pending_review', 'completed'];
 const STATUS_LABEL: Record<string, string> = {
   new: 'جديد', assigned: 'مُعيَّن', in_progress: 'جاري', pending_review: 'مراجعة', completed: 'مكتمل'
 };
@@ -28,7 +28,6 @@ export default function TechnicianDashboard() {
   const [notes, setNotes] = useState('');
   const [cost, setCost] = useState('');
   const [hours, setHours] = useState('');
-  const [filter, setFilter] = useState('');
 
   const myRequests = maintenanceRequests.filter(m => m.technicianId === currentUser?.id);
   const allAssigned = maintenanceRequests.filter(m =>
@@ -41,13 +40,9 @@ export default function TechnicianDashboard() {
   const displayed = activeTab === 'active' ? activeRequests :
     activeTab === 'completed' ? completedRequests : allAssigned;
 
-  const filtered = filter ? displayed.filter(m =>
-    PRIORITY_CONFIG[m.priority]?.label === filter || m.category === filter
-  ) : displayed;
+  const filtered = displayed;
 
-  const selected = selectedRequest ? maintenanceRequests.find(m => m.id === selectedRequest) : null;
-
-  const getProperty = (m: any) => {
+  const getProperty = (m: MaintenanceRequest) => {
     const unit = units.find(u => u.id === m.unitId);
     const prop = unit ? properties.find(p => p.id === unit.propertyId) : null;
     return { unit, property: prop };
@@ -55,7 +50,7 @@ export default function TechnicianDashboard() {
 
   const updateStatus = (id: string, status: string) => {
     updateMaintenanceRequest(id, {
-      status: status as any,
+      status: status as MaintenanceRequest['status'],
       ...(status === 'completed' ? {
         technicianNotes: notes,
         actualCost: parseFloat(cost) || 0,

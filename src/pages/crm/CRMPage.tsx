@@ -93,12 +93,10 @@ function CustomerProfile({
   onClose: () => void;
   onAddInteraction: (customerId: string) => void;
 }) {
-  const { interactions, users, updateCustomer, appointments, contracts } = useStore();
+  const { interactions, users, appointments, contracts } = useStore();
   const customerInteractions = [...interactions.filter(i => i.customerId === customer.id)]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  const customerAppointments = appointments.filter(a => a.customerId === customer.id);
   const assignedUser = users.find(u => u.id === customer.assignedTo);
-  const employees = users.filter(u => u.role === 'employee' || u.role === 'broker');
   const relatedContracts = contracts.filter(c => c.tenantName === customer.name);
 
   return (
@@ -484,7 +482,7 @@ const emptyCustomer = {
 };
 
 export default function CRMPage() {
-  const { customers, interactions, users, appointments, addCustomer, updateCustomer, deleteCustomer,
+  const { customers, interactions, users, addCustomer, updateCustomer, deleteCustomer,
     addInteraction, currentUser } = useStore();
 
   const [activeTab, setActiveTab] = useState<'overview' | 'list' | 'pipeline' | 'interactions' | 'tickets'>('overview');
@@ -493,11 +491,12 @@ export default function CRMPage() {
   const [filterType, setFilterType] = useState('all');
   const [showForm, setShowForm] = useState(false);
   const [showInteractionForm, setShowInteractionForm] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [profileCustomer, setProfileCustomer] = useState<Customer | null>(null);
   const [editing, setEditing] = useState<Customer | null>(null);
   const [form, setForm] = useState(emptyCustomer);
   const [iForm, setIForm] = useState({ customerId: '', type: 'call', summary: '', outcome: '' });
+
+  const threeDaysFromNow = useMemo(() => new Date(Date.now() + 86400000 * 3), []);
 
   const employees = users.filter(u => u.role === 'employee' || u.role === 'broker');
   const myCustomers = currentUser?.role === 'broker'
@@ -521,8 +520,8 @@ export default function CRMPage() {
     negotiating: myCustomers.filter(c => c.status === 'negotiating').length,
     closed: myCustomers.filter(c => c.status === 'closed').length,
     totalInteractions: interactions.length,
-    followUps: myCustomers.filter(c => c.nextFollowUp && new Date(c.nextFollowUp) <= new Date(Date.now() + 86400000 * 3)).length,
-  }), [myCustomers, interactions]);
+    followUps: myCustomers.filter(c => c.nextFollowUp && new Date(c.nextFollowUp) <= threeDaysFromNow).length,
+  }), [myCustomers, interactions, threeDaysFromNow]);
 
   const sourceDistribution = useMemo(() => {
     const d: Record<string, number> = {};
@@ -693,7 +692,7 @@ export default function CRMPage() {
                 <Bell className="w-4 h-4" /> متابعات مستحقة خلال 3 أيام
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {myCustomers.filter(c => c.nextFollowUp && new Date(c.nextFollowUp) <= new Date(Date.now()+86400000*3)).map(c => (
+                {myCustomers.filter(c => c.nextFollowUp && new Date(c.nextFollowUp) <= threeDaysFromNow).map(c => (
                   <div key={c.id} onClick={() => setProfileCustomer(c)}
                     className="flex items-center gap-3 p-2.5 bg-orange-50 rounded-xl cursor-pointer hover:bg-orange-100">
                     <div className="w-8 h-8 bg-orange-200 rounded-xl flex items-center justify-center text-sm font-bold text-orange-700">{c.name.charAt(0)}</div>

@@ -1,13 +1,14 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { useStore, generateId } from '../../data/store';
+import type { MaintenanceRequest } from '../../types';
 import {
   FileText, DollarSign, Wrench, Bell, Calendar, CheckCircle,
-  AlertCircle, Clock, ChevronRight, Plus, Send, MessageCircle,
-  Home, Shield, Phone, Eye, Camera, Star, Upload, X
+  AlertCircle, Plus, Send,
+  Home, Camera, X
 } from 'lucide-react';
 
 export default function TenantDashboard() {
-  const { currentUser, contracts, payments, invoices, maintenanceRequests, appointments, notifications, units, properties, addMaintenanceRequest } = useStore();
+  const { currentUser, contracts, invoices, maintenanceRequests, appointments, notifications, units, properties, addMaintenanceRequest } = useStore();
   const [activeTab, setActiveTab] = useState<'overview' | 'contract' | 'maintenance' | 'appointments'>('overview');
   const [showNewRequest, setShowNewRequest] = useState(false);
   const [requestForm, setRequestForm] = useState({ title: '', category: 'plumbing', priority: 'medium', description: '' });
@@ -27,7 +28,7 @@ export default function TenantDashboard() {
   const unit = activeContract ? units.find(u => u.id === activeContract.unitId) : null;
   const property = unit ? properties.find(p => p.id === unit.propertyId) : null;
 
-  const contractDaysLeft = activeContract ? Math.round((new Date(activeContract.contractEndDate || activeContract.endDate || '').getTime() - Date.now()) / 86400000) : 0;
+  const contractDaysLeft = useMemo(() => activeContract ? Math.round((new Date(activeContract.contractEndDate || activeContract.endDate || '').getTime() - Date.now()) / 86400000) : 0, [activeContract]);
 
   const submitRequest = () => {
     if (!requestForm.title) return;
@@ -35,8 +36,8 @@ export default function TenantDashboard() {
       id: generateId(),
       title: requestForm.title,
       description: requestForm.description,
-      category: requestForm.category as any,
-      priority: requestForm.priority as any,
+      category: requestForm.category as MaintenanceRequest['category'],
+      priority: requestForm.priority as MaintenanceRequest['priority'],
       status: 'new',
       requestSource: 'tenant',
       propertyId: property?.id ?? '',

@@ -3,9 +3,9 @@ import { useStore, generateId } from '../../data/store';
 import type { Contract } from '../../types';
 import {
   FileText, Upload, CheckCircle, ChevronRight, ChevronLeft,
-  AlertCircle, Loader2, Building2, User, Calendar, DollarSign,
-  Hash, MapPin, Phone, Clipboard, RefreshCw, X, Eye, EyeOff, Save,
-  Sparkles, FileCheck, Download
+  AlertCircle, Loader2, Building2, User, DollarSign,
+  Hash, Clipboard, X, Eye, EyeOff, Save,
+  Sparkles, FileCheck
 } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────
@@ -82,7 +82,7 @@ async function extractTextFromPDF(file: File): Promise<string> {
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
           const content = await page.getTextContent();
-          const pageText = content.items.map((item: any) => item.str).join(' ');
+          const pageText = content.items.map((item: { str: string }) => item.str).join(' ');
           fullText += pageText + '\n';
         }
         resolve(fullText);
@@ -118,31 +118,31 @@ function parseEjarContract(text: string): ExtractedContractData {
 
   // Contract number
   data.contractNumber = find([
-    /رقم\s*العقد[:\s]+([A-Z0-9\-]+)/,
-    /Contract\s*(?:No|Number)[.:\s]+([A-Z0-9\-]+)/i,
-    /عقد\s*رقم[:\s]+([A-Z0-9\-]+)/,
+    /رقم\s*العقد[:\s]+([A-Z0-9-]+)/,
+    /Contract\s*(?:No|Number)[.:\s]+([A-Z0-9-]+)/i,
+    /عقد\s*رقم[:\s]+([A-Z0-9-]+)/,
     /(\d{4}-\d{6,})/,
   ]);
 
   data.ejarContractId = find([
-    /رقم\s*الطلب[:\s]+([A-Z0-9\-]+)/,
-    /Ejar\s*(?:ID|Contract)[:\s]+([A-Z0-9\-]+)/i,
-    /منصة\s*إيجار[:\s]+([A-Z0-9\-]+)/,
+    /رقم\s*الطلب[:\s]+([A-Z0-9-]+)/,
+    /Ejar\s*(?:ID|Contract)[:\s]+([A-Z0-9-]+)/i,
+    /منصة\s*إيجار[:\s]+([A-Z0-9-]+)/,
   ]);
 
   // Dates
   data.contractStartDate = find([
-    /تاريخ\s*(?:بداية|البداية|بدء|البدء)\s*العقد[:\s]+(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/,
-    /تاريخ\s*البدء[:\s]+(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/,
-    /Start\s*Date[:\s]+(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/i,
-    /من\s*تاريخ[:\s]+(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/,
+    /تاريخ\s*(?:بداية|البداية|بدء|البدء)\s*العقد[:\s]+(\d{1,2}[/\-.]\d{1,2}[/\-.]\d{4})/,
+    /تاريخ\s*البدء[:\s]+(\d{1,2}[/\-.]\d{1,2}[/\-.]\d{4})/,
+    /Start\s*Date[:\s]+(\d{1,2}[/\-.]\d{1,2}[/\-.]\d{4})/i,
+    /من\s*تاريخ[:\s]+(\d{1,2}[/\-.]\d{1,2}[/\-.]\d{4})/,
   ]);
 
   data.contractEndDate = find([
-    /تاريخ\s*(?:نهاية|الانتهاء|النهاية|انتهاء)\s*العقد[:\s]+(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/,
-    /تاريخ\s*الانتهاء[:\s]+(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/,
-    /End\s*Date[:\s]+(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/i,
-    /إلى\s*تاريخ[:\s]+(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/,
+    /تاريخ\s*(?:نهاية|الانتهاء|النهاية|انتهاء)\s*العقد[:\s]+(\d{1,2}[/\-.]\d{1,2}[/\-.]\d{4})/,
+    /تاريخ\s*الانتهاء[:\s]+(\d{1,2}[/\-.]\d{1,2}[/\-.]\d{4})/,
+    /End\s*Date[:\s]+(\d{1,2}[/\-.]\d{1,2}[/\-.]\d{4})/i,
+    /إلى\s*تاريخ[:\s]+(\d{1,2}[/\-.]\d{1,2}[/\-.]\d{4})/,
   ]);
 
   // Rent
@@ -177,7 +177,7 @@ function parseEjarContract(text: string): ExtractedContractData {
     /اسم\s*المستأجر[:\s]+([^\n\r،,]+)/,
     /Tenant\s*Name[:\s]+([^\n\r,]+)/i,
     /الطرف\s*الثاني[:\s]+([^\n\r،]+)/,
-    /المستأجر[:\s]+([^\n\r،,—\-]+)/,
+    /المستأجر[:\s]+([^\n\r،,—-]+)/,
   ]);
   data.tenantNationalId = find([
     /هوية\s*المستأجر[:\s]+(\d{10})/,
@@ -186,9 +186,9 @@ function parseEjarContract(text: string): ExtractedContractData {
     /\b(1\d{9})\b/,
   ]);
   data.tenantPhone = find([
-    /جوال\s*المستأجر[:\s]+([0-9+\s\-]+)/,
-    /هاتف\s*المستأجر[:\s]+([0-9+\s\-]+)/,
-    /Tenant\s*(?:Phone|Mobile)[:\s]+([0-9+\s\-]+)/i,
+    /جوال\s*المستأجر[:\s]+([0-9+\s-]+)/,
+    /هاتف\s*المستأجر[:\s]+([0-9+\s-]+)/,
+    /Tenant\s*(?:Phone|Mobile)[:\s]+([0-9+\s-]+)/i,
     /\b(05\d{8})\b/,
   ]);
   data.tenantNationality = find([
@@ -201,7 +201,7 @@ function parseEjarContract(text: string): ExtractedContractData {
     /اسم\s*(?:المالك|المؤجر)[:\s]+([^\n\r،,]+)/,
     /Landlord\s*Name[:\s]+([^\n\r,]+)/i,
     /الطرف\s*الأول[:\s]+([^\n\r،]+)/,
-    /المؤجر[:\s]+([^\n\r،,—\-]+)/,
+    /المؤجر[:\s]+([^\n\r،,—-]+)/,
   ]);
   data.landlordNationalId = find([
     /هوية\s*(?:المالك|المؤجر)[:\s]+(\d{10})/,
@@ -209,8 +209,8 @@ function parseEjarContract(text: string): ExtractedContractData {
     /Landlord\s*ID[:\s]+(\d{10})/i,
   ]);
   data.landlordPhone = find([
-    /جوال\s*(?:المالك|المؤجر)[:\s]+([0-9+\s\-]+)/,
-    /هاتف\s*المالك[:\s]+([0-9+\s\-]+)/,
+    /جوال\s*(?:المالك|المؤجر)[:\s]+([0-9+\s-]+)/,
+    /هاتف\s*المالك[:\s]+([0-9+\s-]+)/,
   ]);
   data.landlordIban = find([
     /(?:رقم\s*)?(?:الآيبان|IBAN)[:\s]+([A-Z]{2}\d{2}[A-Z0-9]+)/i,
@@ -280,10 +280,10 @@ function parseEjarContract(text: string): ExtractedContractData {
 function normalizeDate(d?: string): string {
   if (!d) return '';
   // dd/mm/yyyy or dd-mm-yyyy
-  const m1 = d.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
+  const m1 = d.match(/^(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{4})$/);
   if (m1) return `${m1[3]}-${m1[2].padStart(2, '0')}-${m1[1].padStart(2, '0')}`;
   // yyyy-mm-dd or yyyy/mm/dd
-  const m2 = d.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})$/);
+  const m2 = d.match(/^(\d{4})[/\-.](\d{1,2})[/\-.](\d{1,2})$/);
   if (m2) return `${m2[1]}-${m2[2].padStart(2, '0')}-${m2[3].padStart(2, '0')}`;
   return d;
 }
@@ -328,7 +328,6 @@ export default function EjarContractAnalyzer({ onClose, onContractAdded }: Props
   const [file, setFile] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [rawText, setRawText] = useState('');
-  const [extracted, setExtracted] = useState<ExtractedContractData>({});
   const [error, setError] = useState('');
   const [showRaw, setShowRaw] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -371,7 +370,6 @@ export default function EjarContractAnalyzer({ onClose, onContractAdded }: Props
         setEd({});
       } else {
         const parsed = parseEjarContract(text);
-        setExtracted(parsed);
         setEd({
           ...parsed,
           contractStartDate: normalizeDate(parsed.contractStartDate),
@@ -402,7 +400,7 @@ export default function EjarContractAnalyzer({ onClose, onContractAdded }: Props
         }
       }
       setStep(2);
-    } catch (e) {
+    } catch {
       setError('حدث خطأ أثناء تحليل الملف');
     } finally {
       setIsAnalyzing(false);

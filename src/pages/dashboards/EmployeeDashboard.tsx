@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useStore } from '../../data/store';
 import {
   Users, Calendar, Building2, FileText, Wrench, TrendingUp,
-  DollarSign, Bell, CheckCircle, AlertCircle, Clock, Star,
-  Phone, MessageCircle, Plus, ChevronRight, Eye, Filter,
-  Target, BarChart2, Home, MapPin, Search, Activity,
-  ArrowUpRight, ArrowDownRight, Briefcase, UserCheck,
+  DollarSign, Bell, CheckCircle, AlertCircle,
+  Phone, ChevronRight,
+  Target, BarChart2, Home, Search, Activity,
+  UserCheck,
   ClipboardList, PieChart
 } from 'lucide-react';
 
@@ -19,14 +19,16 @@ export default function EmployeeDashboard({ onNavigate }: { onNavigate?: (page: 
   const [activeTab, setActiveTab] = useState<'overview' | 'tasks' | 'crm' | 'reports'>('overview');
   const [searchTerm, setSearchTerm] = useState('');
 
+  const now = useMemo(() => Date.now(), []);
+
   const todayStr = new Date().toISOString().split('T')[0];
 
   // Key metrics
   const activeContracts = contracts.filter(c => c.status === 'active');
-  const expiringContracts = contracts.filter(c => {
-    const days = Math.round((new Date(c.contractEndDate || c.endDate || '').getTime() - Date.now()) / 86400000);
+  const expiringContracts = useMemo(() => contracts.filter(c => {
+    const days = Math.round((new Date(c.contractEndDate || c.endDate || '').getTime() - now) / 86400000);
     return days <= 30 && days > 0 && c.status === 'active';
-  });
+  }), [contracts, now]);
   const overdueInvoices = invoices.filter(i => i.invoiceStatus === 'overdue');
   const openMaintenance = maintenanceRequests.filter(m => m.status !== 'completed' && m.status !== 'cancelled');
   const urgentMaintenance = openMaintenance.filter(m => m.priority === 'urgent' || m.priority === 'high');
@@ -47,15 +49,14 @@ export default function EmployeeDashboard({ onNavigate }: { onNavigate?: (page: 
   const occupancyRate = totalUnits > 0 ? Math.round((rentedUnits / totalUnits) * 100) : 0;
 
   // Recent activity
-  const recentInteractions = interactions?.slice(-5).reverse() ?? [];
   const recentMaintenance = maintenanceRequests.slice(-5).reverse();
 
   // Alerts
-  const alerts = [
-    ...expiringContracts.map(c => ({ type: 'warning', msg: `عقد ${c.contractNumber} ينتهي خلال ${Math.round((new Date(c.contractEndDate || c.endDate || '').getTime() - Date.now()) / 86400000)} يوم`, link: 'contracts-list' })),
+  const alerts = useMemo(() => [
+    ...expiringContracts.map(c => ({ type: 'warning', msg: `عقد ${c.contractNumber} ينتهي خلال ${Math.round((new Date(c.contractEndDate || c.endDate || '').getTime() - now) / 86400000)} يوم`, link: 'contracts-list' })),
     ...overdueInvoices.slice(0, 3).map(i => ({ type: 'danger', msg: `فاتورة متأخرة ${i.invoiceNumber} - ${i.remainingAmount?.toLocaleString('ar-SA')} ر.س`, link: 'payments' })),
     ...urgentMaintenance.slice(0, 2).map(m => ({ type: 'urgent', msg: `بلاغ صيانة عاجل: ${m.title}`, link: 'maintenance' })),
-  ];
+  ], [expiringContracts, overdueInvoices, urgentMaintenance, now]);
 
   const tabs = [
     { id: 'overview', label: 'نظرة عامة', icon: <BarChart2 className="w-4 h-4" /> },
@@ -276,7 +277,7 @@ export default function EmployeeDashboard({ onNavigate }: { onNavigate?: (page: 
             {expiringContracts.length === 0 ? (
               <p className="text-sm text-gray-400 text-center py-3">لا توجد عقود منتهية قريباً</p>
             ) : expiringContracts.map(c => {
-              const days = Math.round((new Date(c.contractEndDate || c.endDate || '').getTime() - Date.now()) / 86400000);
+              const days = Math.round((new Date(c.contractEndDate || c.endDate || '').getTime() - now) / 86400000);
               return (
                 <div key={c.id} className="flex items-center justify-between p-3 bg-yellow-50 rounded-xl mb-2 last:mb-0">
                   <div>
