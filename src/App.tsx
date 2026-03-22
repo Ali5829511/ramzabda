@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useStore } from './data/store';
 import Layout from './components/Layout';
 import AIAssistant from './components/AIAssistant';
@@ -88,6 +88,12 @@ function getPage(page: string) {
 export default function App() {
   const currentUser = useStore(s => s.currentUser);
   const [activePage, setActivePage] = useState('dashboard');
+
+  // Load data from Supabase once on mount (falls back to localStorage when
+  // the env vars are not set, so local development is unaffected).
+  useEffect(() => {
+    useStore.getState().initSupabase();
+  }, []);
 
   if (!currentUser) return <LoginPage />;
 

@@ -7,3 +7,15 @@ healthcheckPath = "/"
 healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
+
+# ─── Required Environment Variables ──────────────────────────────────────────
+# Set these in your Railway project's Variables tab:
+#
+#   VITE_SUPABASE_URL      – Your Supabase project URL
+#                            e.g. https://xxxx.supabase.co
+#
+#   VITE_SUPABASE_ANON_KEY – Your Supabase project anonymous/public key
+#
+# When these variables are present, the app will read from and write to
+# Supabase automatically. When absent, data is persisted to localStorage only.
+# ─────────────────────────────────────────────────────────────────────────────
