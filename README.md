@@ -13,7 +13,7 @@
 |--------|---------|
 | Node.js | 20+ |
 | npm | 10+ |
-| حساب [Railway](https://railway.com) | مجاني أو مدفوع |
+| حساب [Railway](https://railway.app) | مجاني أو مدفوع |
 | مشروع [Supabase](https://supabase.com) | (اختياري، للبيانات المشتركة بين المستخدمين) |
 
 ---
@@ -39,7 +39,7 @@
 #### الطريقة الأولى: تلقائياً عبر GitHub Actions (موصى به)
 
 1. **Fork أو ادفع** هذا المستودع إلى GitHub
-2. أنشئ مشروعاً جديداً على [railway.com](https://railway.com):
+2. أنشئ مشروعاً جديداً على [railway.app](https://railway.app):
    - New Project → Deploy from GitHub repo → اختر المستودع
 3. في Railway → **Variables** أضف:
 
