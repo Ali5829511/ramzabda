@@ -6,7 +6,7 @@ import {
   MessageCircle, CheckCircle, Clock, AlertTriangle, XCircle, ArrowUpCircle,
   User, Phone, Building2, Send, Star, Printer, Tag,
   TrendingUp, BarChart2, AlertCircle, Flag, Eye, EyeOff,
-  MessageSquare, ThumbsUp, Zap, Calendar, Hash, Smartphone
+  MessageSquare, ThumbsUp, Zap, Calendar, Hash, Smartphone, RefreshCw
 } from 'lucide-react';
 
 // ── Ticket Number Generator ────────────────────────────────────

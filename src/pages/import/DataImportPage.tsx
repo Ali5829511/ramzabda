@@ -518,7 +518,7 @@ function ImportCard({ config }: { config: ImportTypeConfig }) {
         if (isDupe) { skipped++; continue; }
 
         // Call store action
-        (store as Record<string, (data: unknown) => void>)[config.storeAction](mapped);
+        (store as unknown as Record<string, (data: unknown) => void>)[config.storeAction](mapped);
         imported++;
       } catch {
         failed++;

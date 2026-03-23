@@ -4,7 +4,7 @@ import type { AppState } from '../../data/store';
 import type { MaintenanceRequest, MaintenanceStatusHistory, PriceQuote, QuoteItem, User } from '../../types';
 import {
   Wrench, Plus, Edit, Trash2, CheckCircle, Clock, AlertTriangle, XCircle,
-  User, Building2, Search, BarChart2, Star,
+  UserCircle, Building2, Search, BarChart2, Star,
   ChevronDown, ChevronUp, Calendar, DollarSign, MessageSquare,
   TrendingUp, Eye, ThumbsUp, ThumbsDown, Smartphone, MessageCircle,
   Home, Shield, UserCheck, Send, FileText,
@@ -281,7 +281,7 @@ function QuoteCard({ quote, req, onUpdate, canOwner, canTenant, now, addHistory 
         {/* Tenant approval (shown after owner approves) */}
         {canTenant && quote.ownerApproval === 'approved' && quote.tenantApproval === 'pending' && (
           <div className="border-t pt-2 mt-2">
-            <p className="text-xs font-bold text-blue-700 mb-1.5 flex items-center gap-1"><User className="w-3 h-3" />قرار المستأجر</p>
+            <p className="text-xs font-bold text-blue-700 mb-1.5 flex items-center gap-1"><UserCircle className="w-3 h-3" />قرار المستأجر</p>
             <div className="flex gap-2 items-center">
               <input className="input-field text-xs flex-1 py-1.5" value={tenantNote} onChange={e => setTenantNote(e.target.value)} placeholder="ملاحظة..." />
               <button onClick={tenantApprove} className="px-3 py-1.5 rounded-lg bg-blue-500 text-white text-xs font-bold flex items-center gap-1 hover:bg-blue-600 shrink-0">
@@ -1632,7 +1632,7 @@ export default function MaintenancePage() {
                         <p className="font-bold text-gray-800 truncate">{r.title}</p>
                         <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-2">
                           <Building2 className="w-3 h-3" />{prop?.propertyName ?? '—'} • وحدة {unit?.unitNumber ?? '—'}
-                          {tenantUser && <span className="flex items-center gap-1"><User className="w-3 h-3" />{tenantUser.name}</span>}
+                          {tenantUser && <span className="flex items-center gap-1"><UserCircle className="w-3 h-3" />{tenantUser.name}</span>}
                           {tech && <span className="flex items-center gap-1 text-blue-600"><Wrench className="w-3 h-3" />{tech.name}</span>}
                         </p>
                       </div>
@@ -1744,7 +1744,7 @@ export default function MaintenancePage() {
       {activeTab === 'technician' && (
         <div className="space-y-4">
           {users.filter(u => u.role === 'technician').length === 0 ? (
-            <div className="card text-center py-12 text-gray-400"><User className="w-12 h-12 mx-auto mb-3 opacity-30" /><p>لا يوجد فنيون مسجلون</p></div>
+            <div className="card text-center py-12 text-gray-400"><UserCircle className="w-12 h-12 mx-auto mb-3 opacity-30" /><p>لا يوجد فنيون مسجلون</p></div>
           ) : (
             users.filter(u => u.role === 'technician').map(tech => {
               const techReqs = scopedRequests.filter(r => r.technicianId === tech.id && !['completed', 'cancelled'].includes(r.status));

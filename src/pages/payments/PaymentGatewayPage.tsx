@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useStore } from '../../data/store';
 import {
   CreditCard, Smartphone, CheckCircle, AlertCircle,
-  QrCode, Copy, Shield, FileText, Lock
+  QrCode, Copy, Shield, FileText, Lock, RefreshCw
 } from 'lucide-react';
 
 const GATEWAYS = [
