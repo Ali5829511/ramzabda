@@ -4,7 +4,7 @@ import {
   Building2, LayoutDashboard, Home, FileText, Wrench,
   Users, Calendar, Megaphone, FileStack, Settings, ClipboardList, Calculator,
   Bell, LogOut, ChevronDown, ChevronRight, Menu, X,
-  DollarSign, UserCheck, Briefcase, Star, TrendingUp,
+  UserCheck, Briefcase, Star, TrendingUp,
   Search, AlertCircle, AlertTriangle, Info, FileWarning, Link2, Ticket, FileSpreadsheet,
   Archive, MapPin, Bot, Target, CreditCard
 } from 'lucide-react';
@@ -31,19 +31,14 @@ const navItems: NavItem[] = [
   ]},
   { id: 'maintenance', label: 'الصيانة', icon: <Wrench className="w-5 h-5" />, roles: ['admin', 'employee', 'owner', 'tenant', 'technician'] },
   { id: 'tickets', label: 'الشكاوى والتذاكر', icon: <Ticket className="w-5 h-5" />, roles: ['admin', 'employee', 'owner', 'tenant'] },
-  { id: 'crm', label: 'إدارة العملاء', icon: <Users className="w-5 h-5" />, roles: ['admin', 'employee', 'broker'], children: [
-    { id: 'crm', label: 'خدمة العملاء (CRM)', roles: ['admin', 'employee', 'broker'] },
-    { id: 'customers', label: 'قائمة العملاء', roles: ['admin', 'employee', 'broker'] },
-    { id: 'interactions', label: 'سجل التواصل', roles: ['admin', 'employee'] },
-  ]},
+  { id: 'crm', label: 'إدارة العملاء', icon: <Users className="w-5 h-5" />, roles: ['admin', 'employee', 'broker'] },
   { id: 'marketing', label: 'التسويق العقاري', icon: <Megaphone className="w-5 h-5" />, roles: ['admin', 'employee', 'broker'], children: [
     { id: 'marketing', label: 'العروض والحملات', roles: ['admin', 'employee', 'broker'] },
     { id: 'brokerage', label: 'عقود الوساطة (REGA)', roles: ['admin', 'employee', 'broker'] },
     { id: 'ad-licenses', label: 'تراخيص الإعلانات (REGA)', roles: ['admin', 'employee', 'broker'] },
     { id: 'appointments', label: 'المواعيد والزيارات', roles: ['admin', 'employee', 'tenant', 'broker'] },
   ]},
-  { id: 'finances', label: 'التقارير المالية', icon: <DollarSign className="w-5 h-5" />, roles: ['admin', 'owner'] },
-  { id: 'accounting', label: 'بوابة المحاسبة', icon: <Calculator className="w-5 h-5" />, roles: ['admin', 'owner', 'employee'] },
+  { id: 'accounting', label: 'المحاسبة والتقارير المالية', icon: <Calculator className="w-5 h-5" />, roles: ['admin', 'owner', 'employee'] },
   { id: 'contract-alerts', label: 'متابعة العقود', icon: <FileWarning className="w-5 h-5" />, roles: ['admin', 'employee', 'owner'] },
   { id: 'integrations', label: 'التكاملات', icon: <Link2 className="w-5 h-5" />, roles: ['admin'] },
   { id: 'print-center', label: 'الطباعة والتصدير', icon: <Briefcase className="w-5 h-5" />, roles: ['admin', 'employee', 'owner'] },
