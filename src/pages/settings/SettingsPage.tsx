@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useStore } from '../../data/store';
-import { Settings, Bell, Shield, Palette, Globe } from 'lucide-react';
+import { Settings, Bell, Shield } from 'lucide-react';
 
 export default function SettingsPage() {
   const { currentUser, updateUser } = useStore();

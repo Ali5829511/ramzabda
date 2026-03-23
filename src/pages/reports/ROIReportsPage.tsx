@@ -2,10 +2,10 @@ import { useState, useMemo } from 'react';
 import { useStore } from '../../data/store';
 import {
   Target, TrendingUp, TrendingDown, BarChart2, Building2,
-  DollarSign, Calendar, Home, Printer, Download, Filter
+  DollarSign, Home, Printer
 } from 'lucide-react';
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, LineChart, Line
 } from 'recharts';
 
@@ -14,7 +14,6 @@ const COLORS = ['#F59E0B', '#10B981', '#3B82F6', '#EF4444', '#8B5CF6'];
 export default function ROIReportsPage() {
   const { properties, units, contracts, invoices, expenses, payments } = useStore();
   const [period, setPeriod] = useState<'month' | 'quarter' | 'year'>('year');
-  const [selectedProp, setSelectedProp] = useState('');
 
   const propertyROI = useMemo(() => {
     return properties.map(p => {
@@ -64,7 +63,7 @@ export default function ROIReportsPage() {
     });
     return Object.entries(map).sort(([a], [b]) => parseInt(a) - parseInt(b))
       .map(([, v]) => ({ ...v, صافي: v.إيرادات - v.مصروفات }));
-  }, [payments, expenses]);
+  }, [payments, expenses, months]);
 
   const chartData = monthlyTrend.length >= 3 ? monthlyTrend : [
     { month: 'يناير', إيرادات: 42000, مصروفات: 8500, صافي: 33500 },

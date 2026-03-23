@@ -5,7 +5,7 @@ import type { Property, Unit, Contract, Payment, Customer, MaintenanceRequest, U
 import {
   Upload, FileSpreadsheet, CheckCircle, AlertCircle, Loader2,
   Building2, Home, FileText, DollarSign, Wrench, Users, UserCheck,
-  Download, Eye, Trash2, RefreshCw, ChevronDown, ChevronUp,
+  Download, RefreshCw, ChevronDown, ChevronUp,
   AlertTriangle, X, Plus, Table2, ArrowRight, Info
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
@@ -196,7 +196,7 @@ function normalizeDate(v: unknown): string {
     if (d) return `${d.y}-${String(d.m).padStart(2, '0')}-${String(d.d).padStart(2, '0')}`;
   }
   // dd/mm/yyyy
-  const m1 = s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
+  const m1 = s.match(/^(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{4})$/);
   if (m1) return `${m1[3]}-${m1[2].padStart(2, '0')}-${m1[1].padStart(2, '0')}`;
   // already ISO
   return s.slice(0, 10) || new Date().toISOString().slice(0, 10);
@@ -518,7 +518,7 @@ function ImportCard({ config }: { config: ImportTypeConfig }) {
         if (isDupe) { skipped++; continue; }
 
         // Call store action
-        (store as any)[config.storeAction](mapped);
+        (store as Record<string, (data: unknown) => void>)[config.storeAction](mapped);
         imported++;
       } catch {
         failed++;
@@ -531,7 +531,9 @@ function ImportCard({ config }: { config: ImportTypeConfig }) {
 
   const handleUpdate = async () => {
     setIsImporting(true);
-    let imported = 0, skipped = 0, failed = 0;
+    let imported = 0;
+    const skipped = 0;
+    let failed = 0;
 
     for (let i = 0; i < rows.length; i++) {
       if (errors[i]?.length) { failed++; continue; }
@@ -541,10 +543,10 @@ function ImportCard({ config }: { config: ImportTypeConfig }) {
 
         const existing = findExisting(config.id, mapped, store);
         if (existing) {
-          (store as any)[config.storeAction.replace('add', 'update')](existing.id, mapped);
+          (store as Record<string, (id: string, data: unknown) => void>)[config.storeAction.replace('add', 'update')](existing.id, mapped);
           imported++;
         } else {
-          (store as any)[config.storeAction](mapped);
+          (store as Record<string, (data: unknown) => void>)[config.storeAction](mapped);
           imported++;
         }
       } catch {
@@ -666,7 +668,7 @@ function ImportCard({ config }: { config: ImportTypeConfig }) {
 }
 
 // ─── Duplicate / Find helpers ─────────────────────────────────
-function checkDuplicate(typeId: string, mapped: any, store: AppState): boolean {
+function checkDuplicate(typeId: string, mapped: Record<string, unknown>, store: AppState): boolean {
   switch (typeId) {
     case 'properties': return store.properties.some(p => p.titleDeedNumber === mapped.titleDeedNumber);
     case 'units': return store.units.some(u => u.unitNumber === mapped.unitNumber && u.titleDeedNumber === mapped.titleDeedNumber);
@@ -678,7 +680,7 @@ function checkDuplicate(typeId: string, mapped: any, store: AppState): boolean {
   }
 }
 
-function findExisting(typeId: string, mapped: any, store: AppState): any {
+function findExisting(typeId: string, mapped: Record<string, unknown>, store: AppState): Record<string, unknown> | undefined {
   switch (typeId) {
     case 'properties': return store.properties.find(p => p.titleDeedNumber === mapped.titleDeedNumber);
     case 'units': return store.units.find(u => u.unitNumber === mapped.unitNumber && u.titleDeedNumber === mapped.titleDeedNumber);

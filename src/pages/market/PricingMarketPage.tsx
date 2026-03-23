@@ -1,10 +1,10 @@
-import { useState, useMemo } from 'react';
-import { useStore, generateId } from '../../data/store';
+import { useState } from 'react';
+import { useStore } from '../../data/store';
 import {
-  TrendingUp, Building2, MapPin, Home, BarChart2, DollarSign,
-  FileText, Download, Printer, RefreshCw, ExternalLink, Star,
-  ChevronDown, ChevronUp, Info, AlertCircle, Search,
-  CheckCircle, Calendar, Sparkles, ArrowUpRight, ArrowDownRight,
+  TrendingUp, MapPin, Home, BarChart2, DollarSign,
+  Printer, ExternalLink,
+  ChevronDown, ChevronUp, Search,
+  CheckCircle, ArrowUpRight, ArrowDownRight,
   Minus, Eye, Copy, Share2, Globe
 } from 'lucide-react';
 
@@ -986,7 +986,7 @@ export default function PricingMarketPage() {
           { id: 'market', label: 'الدراسة السوقية للملاك', icon: <TrendingUp className="w-4 h-4" /> },
           { id: 'pricing', label: 'قوالب التسعير وعروض الأسعار', icon: <DollarSign className="w-4 h-4" /> },
         ].map(t => (
-          <button key={t.id} onClick={() => setTab(t.id as any)}
+          <button key={t.id} onClick={() => setTab(t.id as 'market' | 'pricing')}
             className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-px ${tab === t.id ? 'border-green-500 text-green-700' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
             {t.icon} {t.label}
           </button>

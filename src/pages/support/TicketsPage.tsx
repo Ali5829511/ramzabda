@@ -4,7 +4,7 @@ import type { SupportTicket, TicketComment } from '../../types';
 import {
   Ticket, Plus, Search, Filter, ChevronDown, ChevronUp, Edit, Trash2,
   MessageCircle, CheckCircle, Clock, AlertTriangle, XCircle, ArrowUpCircle,
-  User, Phone, Building2, Send, Star, Printer, RefreshCw, Tag,
+  User, Phone, Building2, Send, Star, Printer, Tag,
   TrendingUp, BarChart2, AlertCircle, Flag, Eye, EyeOff,
   MessageSquare, ThumbsUp, Zap, Calendar, Hash, Smartphone
 } from 'lucide-react';
@@ -264,7 +264,7 @@ function TicketDetail({ ticket, onClose, onUpdate }: {
   onClose: () => void;
   onUpdate: (id: string, data: Partial<SupportTicket>) => void;
 }) {
-  const { users, currentUser, customers } = useStore();
+  const { users, currentUser } = useStore();
   const [newComment, setNewComment] = useState('');
   const [isInternal, setIsInternal] = useState(false);
   const [resolution, setResolution] = useState(ticket.resolution ?? '');
@@ -320,7 +320,7 @@ function TicketDetail({ ticket, onClose, onUpdate }: {
       status,
       assignedTo: assignedTo || undefined,
       priority,
-      satisfactionRating: rating as any,
+      satisfactionRating: rating as SupportTicket['satisfactionRating'],
       satisfactionNote: ratingNote || undefined,
       escalationReason: escalationReason || undefined,
       updatedAt: new Date().toISOString(),
@@ -424,13 +424,13 @@ function TicketDetail({ ticket, onClose, onUpdate }: {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             <div>
               <label className="label">الحالة</label>
-              <select className="input-field text-sm" value={status} onChange={e => setStatus(e.target.value as any)}>
+              <select className="input-field text-sm" value={status} onChange={e => setStatus(e.target.value as SupportTicket['status'])}>
                 {Object.entries(statusLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select>
             </div>
             <div>
               <label className="label">الأولوية</label>
-              <select className="input-field text-sm" value={priority} onChange={e => setPriority(e.target.value as any)}>
+              <select className="input-field text-sm" value={priority} onChange={e => setPriority(e.target.value as SupportTicket['priority'])}>
                 {Object.entries(priorityLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select>
             </div>
@@ -466,7 +466,7 @@ function TicketDetail({ ticket, onClose, onUpdate }: {
               <p className="text-sm font-bold text-yellow-800 mb-3 flex items-center gap-2">
                 <Star className="w-4 h-4" /> تقييم رضا العميل
               </p>
-              <StarRating value={rating} onChange={v => setRating(v as any)} />
+              <StarRating value={rating} onChange={v => setRating(v as SupportTicket['satisfactionRating'])} />
               <input className="input-field text-sm mt-3" value={ratingNote}
                 onChange={e => setRatingNote(e.target.value)}
                 placeholder="ملاحظة العميل (اختياري)..." />
@@ -578,7 +578,7 @@ function TicketForm({ editing, onSave, onClose }: {
   onSave: (data: Partial<SupportTicket>) => void;
   onClose: () => void;
 }) {
-  const { customers, properties, units, contracts, users, currentUser } = useStore();
+  const { customers, properties, units, users } = useStore();
   const [form, setForm] = useState({
     customerName: editing?.customerName ?? '',
     customerPhone: editing?.customerPhone ?? '',
@@ -655,7 +655,7 @@ function TicketForm({ editing, onSave, onClose }: {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="label">الفئة *</label>
-              <select className="input-field text-sm" value={form.category} onChange={e => set({ category: e.target.value as any })}>
+              <select className="input-field text-sm" value={form.category} onChange={e => set({ category: e.target.value as SupportTicket['category'] })}>
                 {Object.entries(categoryLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select>
             </div>
@@ -666,13 +666,13 @@ function TicketForm({ editing, onSave, onClose }: {
             </div>
             <div>
               <label className="label">الأولوية</label>
-              <select className="input-field text-sm" value={form.priority} onChange={e => set({ priority: e.target.value as any })}>
+              <select className="input-field text-sm" value={form.priority} onChange={e => set({ priority: e.target.value as SupportTicket['priority'] })}>
                 {Object.entries(priorityLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select>
             </div>
             <div>
               <label className="label">قناة الاستقبال</label>
-              <select className="input-field text-sm" value={form.channel} onChange={e => set({ channel: e.target.value as any })}>
+              <select className="input-field text-sm" value={form.channel} onChange={e => set({ channel: e.target.value as SupportTicket['channel'] })}>
                 {Object.entries(channelLabels).map(([v, l]) => <option key={v} value={v}>{channelIcons[v]} {l}</option>)}
               </select>
             </div>
@@ -931,7 +931,7 @@ export default function TicketsPage() {
             ))}
           </select>
         )}
-        <select className="input-field w-36" value={sortBy} onChange={e => setSortBy(e.target.value as any)}>
+        <select className="input-field w-36" value={sortBy} onChange={e => setSortBy(e.target.value as 'createdAt' | 'priority' | 'updatedAt')}>
           <option value="createdAt">الأحدث أولاً</option>
           <option value="updatedAt">آخر تحديث</option>
           <option value="priority">حسب الأولوية</option>

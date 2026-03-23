@@ -238,8 +238,9 @@ function LicenseCard({ lic, onEdit, onDelete, onPrint, canManage }: {
   lic: AdLicense; onEdit: () => void; onDelete: () => void; onPrint: () => void; canManage: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const nowMs = Date.now();
   const daysLeft = lic.expiryDate
-    ? Math.ceil((new Date(lic.expiryDate).getTime() - Date.now()) / 86400000)
+    ? Math.ceil((new Date(lic.expiryDate).getTime() - nowMs) / 86400000)
     : null;
   const expiringSoon = daysLeft !== null && daysLeft > 0 && daysLeft <= 14;
 
@@ -782,8 +783,9 @@ export default function AdLicensesPage() {
         (l.brokerLicenseNumber ?? '').toLowerCase().includes(q);
     }), [myLicenses, filterStatus, filterType, search]);
 
+  const nowTs = Date.now();
   const kpis = useMemo(() => {
-    const now = Date.now();
+    const now = nowTs;
     return {
       total: myLicenses.length,
       approved: myLicenses.filter(l => l.status === 'approved').length,
@@ -796,7 +798,7 @@ export default function AdLicensesPage() {
       totalViews: myLicenses.reduce((s, l) => s + (l.views ?? 0), 0),
       feesPending: myLicenses.filter(l => !l.feesPaid && (l.licenseFee ?? 0) > 0).reduce((s, l) => s + (l.licenseFee ?? 0), 0),
     };
-  }, [myLicenses]);
+  }, [myLicenses, nowTs]);
 
   const handleSave = (data: Omit<AdLicense, 'id' | 'licenseNumber' | 'createdAt'>) => {
     const now = new Date().toISOString();

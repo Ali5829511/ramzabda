@@ -515,8 +515,9 @@ export default function BrokerageContractsPage() {
         c.brokerLicenseNumber.toLowerCase().includes(q);
     }), [myContracts, filterStatus, filterType, search]);
 
+  const nowTs = Date.now();
   const kpis = useMemo(() => {
-    const now = Date.now();
+    const now = nowTs;
     return {
     total: myContracts.length,
     active: myContracts.filter(c => c.status === 'active').length,
@@ -530,7 +531,7 @@ export default function BrokerageContractsPage() {
       .filter(c => c.dealStatus === 'deal_done')
       .reduce((s, c) => s + (c.commissionAmount ?? (c.dealAmount ?? 0) * c.commissionRate / 100), 0),
     };
-  }, [myContracts]);
+  }, [myContracts, nowTs]);
 
   const openEdit = (c: BrokerageContract) => {
     setEditing(c);

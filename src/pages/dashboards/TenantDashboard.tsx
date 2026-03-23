@@ -28,7 +28,8 @@ export default function TenantDashboard() {
   const unit = activeContract ? units.find(u => u.id === activeContract.unitId) : null;
   const property = unit ? properties.find(p => p.id === unit.propertyId) : null;
 
-  const contractDaysLeft = useMemo(() => activeContract ? Math.round((new Date(activeContract.contractEndDate || activeContract.endDate || '').getTime() - Date.now()) / 86400000) : 0, [activeContract]);
+  const nowTs = Date.now();
+  const contractDaysLeft = useMemo(() => activeContract ? Math.round((new Date(activeContract.contractEndDate || activeContract.endDate || '').getTime() - nowTs) / 86400000) : 0, [activeContract, nowTs]);
 
   const submitRequest = () => {
     if (!requestForm.title) return;

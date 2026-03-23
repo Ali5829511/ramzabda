@@ -1,9 +1,12 @@
 import { useStore } from '../../data/store';
 import { DollarSign, TrendingUp, TrendingDown, BarChart2 } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+
+const MONTHLY_MULTIPLIERS = [0.84, 0.92, 0.96, 1.0, 1.04, 1.08];
+const EXPENSE_MULTIPLIERS = [0.76, 0.88, 0.94, 1.0, 1.06, 1.12];
 
 export default function FinancesPage() {
-  const { payments, expenses, contracts, properties, units, currentUser } = useStore();
+  const { payments, expenses, contracts, properties, currentUser } = useStore();
 
   const myProperties = currentUser?.role === 'owner'
     ? properties.filter(p => p.ownerId === currentUser.id)
@@ -21,8 +24,8 @@ export default function FinancesPage() {
 
   const monthly = ['أكتوبر', 'نوفمبر', 'ديسمبر', 'يناير', 'فبراير', 'مارس'].map((month, i) => ({
     month,
-    إيرادات: (totalRevenue / 6) * (0.8 + Math.random() * 0.4) | 0,
-    مصروفات: (totalExpenses / 6) * (0.7 + Math.random() * 0.6) | 0,
+    إيرادات: (totalRevenue / 6) * MONTHLY_MULTIPLIERS[i] | 0,
+    مصروفات: (totalExpenses / 6) * EXPENSE_MULTIPLIERS[i] | 0,
   }));
 
   const expenseByCategory = ['maintenance', 'utilities', 'management', 'marketing', 'other'].map(cat => ({

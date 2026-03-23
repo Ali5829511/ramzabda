@@ -13,13 +13,13 @@ export default function EmployeeDashboard({ onNavigate }: { onNavigate?: (page: 
   const {
     currentUser, properties, units, contracts, payments, invoices,
     maintenanceRequests, customers, appointments, expenses,
-    supportTickets, interactions
+    supportTickets
   } = useStore();
 
   const [activeTab, setActiveTab] = useState<'overview' | 'tasks' | 'crm' | 'reports'>('overview');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const now = useMemo(() => Date.now(), []);
+  const now = Date.now();
 
   const todayStr = new Date().toISOString().split('T')[0];
 

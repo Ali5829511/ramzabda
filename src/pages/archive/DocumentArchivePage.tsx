@@ -50,7 +50,8 @@ export default function DocumentArchivePage() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
-  const in90Days = useMemo(() => new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10), []);
+  const nowTs = Date.now();
+  const in90Days = useMemo(() => new Date(nowTs + 90 * 86400000).toISOString().slice(0, 10), [nowTs]);
 
   const filtered = docs.filter(d => {
     const q = search.toLowerCase();

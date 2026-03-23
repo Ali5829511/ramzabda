@@ -93,7 +93,7 @@ function CustomerProfile({
   onClose: () => void;
   onAddInteraction: (customerId: string) => void;
 }) {
-  const { interactions, users, appointments, contracts } = useStore();
+  const { interactions, users, contracts } = useStore();
   const customerInteractions = [...interactions.filter(i => i.customerId === customer.id)]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   const assignedUser = users.find(u => u.id === customer.assignedTo);
@@ -496,7 +496,8 @@ export default function CRMPage() {
   const [form, setForm] = useState(emptyCustomer);
   const [iForm, setIForm] = useState({ customerId: '', type: 'call', summary: '', outcome: '' });
 
-  const threeDaysFromNow = useMemo(() => new Date(Date.now() + 86400000 * 3), []);
+  const nowTs = Date.now();
+  const threeDaysFromNow = useMemo(() => new Date(nowTs + 86400000 * 3), [nowTs]);
 
   const employees = users.filter(u => u.role === 'employee' || u.role === 'broker');
   const myCustomers = currentUser?.role === 'broker'
