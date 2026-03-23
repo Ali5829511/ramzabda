@@ -1,4 +1,4 @@
-import { PrintLayout, PrintSection, PrintGrid, PrintField, PrintTable } from '../components/PrintLayout';
+import { PrintLayout, PrintSection, PrintGrid, PrintField } from '../components/PrintLayout';
 import { useStore } from '../data/store';
 import type { Contract } from '../types';
 
