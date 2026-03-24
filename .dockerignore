@@ -5,3 +5,15 @@ dist-ssr
 *.log
 *.local
 .DS_Store
+
+# Data and analysis files not needed for Docker build
+*.txt
+*.py
+properties_data.json
+
+# Dev config files not needed inside the image
+.devcontainer
+nixpacks.toml
+railway.toml
+.github
+README.md
