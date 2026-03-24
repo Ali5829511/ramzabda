@@ -3,4 +3,4 @@
 # vite, typescript, and @types/*) regardless of NODE_ENV, because the build
 # step requires these tools even in a production environment.
 [phases.install]
-cmds = ["NODE_ENV= npm ci"]
+cmds = ["npm ci --include=dev"]

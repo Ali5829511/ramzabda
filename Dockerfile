@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 # Install ALL dependencies (including devDependencies such as vite and
 # typescript) regardless of NODE_ENV so the build tools are available.
-RUN NODE_ENV= npm ci
+RUN npm ci --include=dev
 
 COPY . .
 
