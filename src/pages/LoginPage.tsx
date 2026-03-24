@@ -13,13 +13,13 @@ const roleConfig: Record<string, { label: string; color: string; bg: string; bor
 
 export default function LoginPage() {
   const login = useStore(s => s.login);
-  const users = useStore(s => s.users);
+  // const users = useStore(s => s.users); // لم يعد هناك حاجة للمستخدمين السريعين
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'login' | 'quick'>('login');
+  // const [activeTab, setActiveTab] = useState<'login' | 'quick'>('login');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,10 +31,7 @@ export default function LoginPage() {
     setLoading(false);
   };
 
-  const quickLogin = (userEmail: string, userPass: string) => {
-    setLoading(true);
-    setTimeout(() => { login(userEmail, userPass); setLoading(false); }, 400);
-  };
+  // دالة الدخول السريع لم تعد مطلوبة
 
   const roleGroups = Object.entries(roleConfig);
 
@@ -79,21 +76,9 @@ export default function LoginPage() {
           </div>
 
           <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
-            {/* Tabs */}
-            <div className="flex border-b border-gray-100">
-              {[
-                { id: 'login', label: 'تسجيل الدخول', icon: <Lock className="w-4 h-4" /> },
-                { id: 'quick', label: 'دخول سريع', icon: <Sparkles className="w-4 h-4" /> },
-              ].map(t => (
-                <button key={t.id} onClick={() => setActiveTab(t.id as any)}
-                  className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-semibold transition-colors ${activeTab === t.id ? 'text-yellow-600 border-b-2 border-yellow-500 bg-yellow-50/50' : 'text-gray-400 hover:text-gray-600'}`}>
-                  {t.icon} {t.label}
-                </button>
-              ))}
-            </div>
+            {/* حذف التبويبات الخاصة بالدخول السريع */}
 
             <div className="p-8">
-              {activeTab === 'login' ? (
                 <form onSubmit={handleLogin} className="space-y-5">
                   <div className="text-center mb-2">
                     <div className="w-14 h-14 bg-yellow-500 rounded-2xl flex items-center justify-center mx-auto mb-3">
@@ -131,7 +116,6 @@ export default function LoginPage() {
                       <p className="text-red-600 text-sm font-medium">{error}</p>
                     </div>
                   )}
-
                   <button type="submit" disabled={loading}
                     className="btn-primary w-full justify-center py-3 text-base disabled:opacity-60">
                     {loading ? (
@@ -141,37 +125,6 @@ export default function LoginPage() {
                     )}
                   </button>
                 </form>
-              ) : (
-                <div className="space-y-4">
-                  <div className="text-center mb-2">
-                    <p className="text-sm text-gray-500">اختر حسابك لدخول سريع</p>
-                  </div>
-                  <div className="space-y-2 max-h-96 overflow-y-auto">
-                    {users.filter(u => u.isActive).slice(0, 12).map(u => {
-                      const cfg = roleConfig[u.role] ?? roleConfig.employee;
-                      return (
-                        <button key={u.id} onClick={() => quickLogin(u.email, u.password)}
-                          className={`w-full flex items-center gap-3 p-3.5 rounded-xl border ${cfg.border} ${cfg.bg} hover:shadow-sm transition-all text-right group`}>
-                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-lg shadow-sm shrink-0">
-                            {cfg.icon}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className={`font-bold text-sm ${cfg.color} truncate`}>{u.name}</p>
-                            <p className="text-xs text-gray-400">{cfg.label}</p>
-                          </div>
-                          <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition-colors" />
-                        </button>
-                      );
-                    })}
-                  </div>
-                  {loading && (
-                    <div className="flex items-center justify-center gap-2 py-2">
-                      <div className="w-4 h-4 border-2 border-yellow-500/30 border-t-yellow-500 rounded-full animate-spin" />
-                      <span className="text-xs text-gray-400">جارٍ الدخول...</span>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           </div>
 

@@ -12,6 +12,7 @@ const yesterday = new Date(Date.now() - 86400000).toISOString();
 // ============================================================
 export const users: User[] = [
   { id: 'u1', name: 'محمد العمري', email: 'admin@ramzabdae.com', password: 'admin123', role: 'admin', phone: '0501234567', createdAt: now, isActive: true },
+  { id: 'u7', name: 'مدير النظام', email: 'aliayashi522@gmail.com', password: 'Aali1231@', role: 'admin', phone: '', createdAt: now, isActive: true },
   { id: 'u2', name: 'سارة الأحمدي', email: 'employee@ramzabdae.com', password: 'emp123', role: 'employee', phone: '0509876543', createdAt: now, isActive: true },
   { id: 'u3', name: 'عبدالله الغامدي', email: 'owner@ramzabdae.com', password: 'owner123', role: 'owner', phone: '0551234567', createdAt: now, isActive: true },
   { id: 'u4', name: 'فاطمة الزهراني', email: 'tenant@ramzabdae.com', password: 'tenant123', role: 'tenant', phone: '0561234567', createdAt: now, isActive: true },
