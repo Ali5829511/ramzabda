@@ -518,7 +518,7 @@ function ImportCard({ config }: { config: ImportTypeConfig }) {
         if (isDupe) { skipped++; continue; }
 
         // Call store action
-        (store as unknown as Record<string, (data: unknown) => void>)[config.storeAction](mapped);
+        (store as unknown as Record<string, (data: unknown) => void>)[config.storeAction](mapped as unknown);
         imported++;
       } catch {
         failed++;
@@ -543,10 +543,10 @@ function ImportCard({ config }: { config: ImportTypeConfig }) {
 
         const existing = findExisting(config.id, mapped, store);
         if (existing) {
-          (store as Record<string, (id: string, data: unknown) => void>)[config.storeAction.replace('add', 'update')](existing.id, mapped);
+          (store as unknown as Record<string, (id: string, data: unknown) => void>)[config.storeAction.replace('add', 'update')]((existing as Record<string, unknown>).id as string, mapped as unknown);
           imported++;
         } else {
-          (store as Record<string, (data: unknown) => void>)[config.storeAction](mapped);
+          (store as unknown as Record<string, (data: unknown) => void>)[config.storeAction](mapped as unknown);
           imported++;
         }
       } catch {
@@ -668,26 +668,28 @@ function ImportCard({ config }: { config: ImportTypeConfig }) {
 }
 
 // ─── Duplicate / Find helpers ─────────────────────────────────
-function checkDuplicate(typeId: string, mapped: Record<string, unknown>, store: AppState): boolean {
+function checkDuplicate(typeId: string, mapped: unknown, store: AppState): boolean {
+  const m = mapped as Record<string, unknown>;
   switch (typeId) {
-    case 'properties': return store.properties.some(p => p.titleDeedNumber === mapped.titleDeedNumber);
-    case 'units': return store.units.some(u => u.unitNumber === mapped.unitNumber && u.titleDeedNumber === mapped.titleDeedNumber);
-    case 'contracts': return store.contracts.some(c => c.contractNumber === mapped.contractNumber);
-    case 'payments': return store.payments.some(p => p.paymentNumber === mapped.paymentNumber);
-    case 'customers': return store.customers.some(c => c.phone === mapped.phone);
-    case 'users': return store.users.some(u => u.email === mapped.email);
+    case 'properties': return store.properties.some(p => p.titleDeedNumber === m.titleDeedNumber);
+    case 'units': return store.units.some(u => u.unitNumber === m.unitNumber && u.titleDeedNumber === m.titleDeedNumber);
+    case 'contracts': return store.contracts.some(c => c.contractNumber === m.contractNumber);
+    case 'payments': return store.payments.some(p => p.paymentNumber === m.paymentNumber);
+    case 'customers': return store.customers.some(c => c.phone === m.phone);
+    case 'users': return store.users.some(u => u.email === m.email);
     default: return false;
   }
 }
 
-function findExisting(typeId: string, mapped: Record<string, unknown>, store: AppState): Record<string, unknown> | undefined {
+function findExisting(typeId: string, mapped: unknown, store: AppState): unknown {
+  const m = mapped as Record<string, unknown>;
   switch (typeId) {
-    case 'properties': return store.properties.find(p => p.titleDeedNumber === mapped.titleDeedNumber);
-    case 'units': return store.units.find(u => u.unitNumber === mapped.unitNumber && u.titleDeedNumber === mapped.titleDeedNumber);
-    case 'contracts': return store.contracts.find(c => c.contractNumber === mapped.contractNumber);
-    case 'payments': return store.payments.find(p => p.paymentNumber === mapped.paymentNumber);
-    case 'customers': return store.customers.find(c => c.phone === mapped.phone);
-    case 'users': return store.users.find(u => u.email === mapped.email);
+    case 'properties': return store.properties.find(p => p.titleDeedNumber === m.titleDeedNumber);
+    case 'units': return store.units.find(u => u.unitNumber === m.unitNumber && u.titleDeedNumber === m.titleDeedNumber);
+    case 'contracts': return store.contracts.find(c => c.contractNumber === m.contractNumber);
+    case 'payments': return store.payments.find(p => p.paymentNumber === m.paymentNumber);
+    case 'customers': return store.customers.find(c => c.phone === m.phone);
+    case 'users': return store.users.find(u => u.email === m.email);
     default: return null;
   }
 }
