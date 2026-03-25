@@ -12,6 +12,8 @@ import ListingsPage from './pages/ListingsPage'
 import PaymentsPage from './pages/PaymentsPage'
 import UsersPage from './pages/UsersPage'
 import MarketingPage from './pages/MarketingPage'
+import MapPage from './pages/MapPage'
+import SuggestionsPage from './pages/SuggestionsPage'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore()
@@ -27,6 +29,8 @@ export default function App() {
         <Route path="properties" element={<PropertiesPage />} />
         <Route path="properties/add" element={<AddPropertyPage />} />
         <Route path="properties/:id" element={<PropertyDetailPage />} />
+        <Route path="map" element={<MapPage />} />
+        <Route path="suggestions" element={<SuggestionsPage />} />
         <Route path="contracts" element={<ContractsPage />} />
         <Route path="maintenance" element={<MaintenancePage />} />
         <Route path="listings" element={<ListingsPage />} />

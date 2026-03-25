@@ -4,3 +4,8 @@ dist
 build
 uploads
 *.log
+dev.db
+*.db
+Untitled-*.txt
+test-db.js
+.railway-config
