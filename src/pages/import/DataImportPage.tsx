@@ -8,7 +8,7 @@ import {
   Download, RefreshCw, ChevronDown, ChevronUp,
   AlertTriangle, X, Plus, Table2, ArrowRight, Info
 } from 'lucide-react';
-import * as XLSX from 'xlsx';
+import { Workbook } from 'exceljs';
 
 // ─── Import types config ──────────────────────────────────────
 interface ImportTypeConfig {
@@ -187,12 +187,20 @@ const IMPORT_TYPES: ImportTypeConfig[] = [
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────
+/** Convert an Excel serial date number (days since 1900-01-00) to {y,m,d}. */
+function excelSerialToDate(serial: number): { y: number; m: number; d: number } | null {
+  if (serial < 1) return null;
+  // Excel epoch = Dec 30, 1899; Unix epoch = Jan 1, 1970 → delta = 25569 days
+  const date = new Date(Math.round((serial - 25569) * 86400 * 1000));
+  return { y: date.getUTCFullYear(), m: date.getUTCMonth() + 1, d: date.getUTCDate() };
+}
+
 function normalizeDate(v: unknown): string {
   if (!v) return new Date().toISOString().slice(0, 10);
   const s = String(v).trim();
   // Excel serial number
   if (/^\d{4,5}$/.test(s)) {
-    const d = XLSX.SSF.parse_date_code(Number(s));
+    const d = excelSerialToDate(Number(s));
     if (d) return `${d.y}-${String(d.m).padStart(2, '0')}-${String(d.d).padStart(2, '0')}`;
   }
   // dd/mm/yyyy
@@ -381,19 +389,31 @@ function mapRow(typeId: string, row: Record<string, unknown>, store: AppState) {
 }
 
 // ─── Download sample template ─────────────────────────────────
-function downloadTemplate(config: ImportTypeConfig) {
-  const wb = XLSX.utils.book_new();
-  const headers = config.columns.map(c => c.label);
-  const sampleRows = config.sampleData.map(row =>
-    config.columns.map(c => row[c.key] ?? '')
+async function downloadTemplate(config: ImportTypeConfig) {
+  const workbook = new Workbook();
+  const sheet = workbook.addWorksheet(config.label);
+
+  // Set column widths (no header property so we add the header row manually)
+  sheet.columns = config.columns.map(() => ({ width: 22 }));
+
+  // Header row
+  sheet.addRow(config.columns.map(c => c.label));
+
+  // Sample data rows
+  config.sampleData.forEach(row =>
+    sheet.addRow(config.columns.map(c => row[c.key] ?? ''))
   );
-  const ws = XLSX.utils.aoa_to_sheet([headers, ...sampleRows]);
 
-  // Column widths
-  ws['!cols'] = config.columns.map(() => ({ wch: 22 }));
-
-  XLSX.utils.book_append_sheet(wb, ws, config.label);
-  XLSX.writeFile(wb, `نموذج_استيراد_${config.label}.xlsx`);
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `نموذج_استيراد_${config.label}.xlsx`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 // ─── Preview table ────────────────────────────────────────────
@@ -475,10 +495,48 @@ function ImportCard({ config }: { config: ImportTypeConfig }) {
   const parseFile = useCallback((file: File) => {
     setFileName(file.name);
     const reader = new FileReader();
-    reader.onload = (e) => {
-      const wb = XLSX.read(e.target?.result, { type: 'array', cellDates: true });
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const jsonRaw = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: '' });
+    reader.onload = async (e) => {
+      const buffer = e.target?.result as ArrayBuffer;
+      let jsonRaw: Record<string, unknown>[];
+
+      if (file.name.toLowerCase().endsWith('.csv')) {
+        // Simple CSV parser for comma-separated text files
+        const text = new TextDecoder('utf-8').decode(buffer);
+        const lines = text.split(/\r?\n/).filter(l => l.trim());
+        const headers = lines[0]?.split(',').map(h => h.trim().replace(/^"|"$/g, '')) ?? [];
+        jsonRaw = lines.slice(1).map(line => {
+          const values = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+          const obj: Record<string, unknown> = {};
+          headers.forEach((h, i) => { obj[h] = values[i] ?? ''; });
+          return obj;
+        });
+      } else {
+        const workbook = new Workbook();
+        await workbook.xlsx.load(buffer);
+        const ws = workbook.worksheets[0];
+        const headers: string[] = [];
+        let firstRow = true;
+        jsonRaw = [];
+        ws.eachRow({ includeEmpty: false }, (row) => {
+          if (firstRow) {
+            row.eachCell({ includeEmpty: true }, (cell, colIdx) => {
+              headers[colIdx - 1] = String(cell.value ?? '');
+            });
+            firstRow = false;
+            return;
+          }
+          const obj: Record<string, unknown> = {};
+          headers.forEach((h, i) => {
+            const cell = row.getCell(i + 1);
+            let val = cell.value;
+            // ExcelJS returns Date objects for date cells
+            if (val instanceof Date) val = val.toISOString().slice(0, 10);
+            obj[h] = val ?? '';
+          });
+          jsonRaw.push(obj);
+        });
+      }
+
       setRows(jsonRaw);
 
       // Validate required fields
@@ -574,7 +632,7 @@ function ImportCard({ config }: { config: ImportTypeConfig }) {
           </div>
         </div>
         <button
-          onClick={() => downloadTemplate(config)}
+          onClick={() => void downloadTemplate(config)}
           className="flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 bg-blue-50 px-3 py-1.5 rounded-lg">
           <Download className="w-3.5 h-3.5" /> نموذج Excel
         </button>
@@ -589,7 +647,7 @@ function ImportCard({ config }: { config: ImportTypeConfig }) {
         onDrop={handleDrop}
         onClick={() => fileRef.current?.click()}>
         <input ref={fileRef} type="file"
-          accept=".xlsx,.xls,.csv"
+          accept=".xlsx,.csv"
           className="hidden"
           onChange={e => { const f = e.target.files?.[0]; if (f) parseFile(f); }} />
 
@@ -611,7 +669,7 @@ function ImportCard({ config }: { config: ImportTypeConfig }) {
           <div className="space-y-2">
             <Upload className="w-10 h-10 mx-auto text-gray-400" />
             <p className="text-sm font-medium text-gray-600">اضغط لاختيار الملف أو اسحبه هنا</p>
-            <p className="text-xs text-yellow-600">ملفات Excel (.xlsx, .xls, .csv)</p>
+            <p className="text-xs text-yellow-600">ملفات Excel (.xlsx, .csv)</p>
           </div>
         )}
       </div>
@@ -745,7 +803,7 @@ export default function DataImportPage() {
           <span className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3" /> <strong>تحديث/دمج</strong>: يحدّث السجلات الموجودة ويضيف الجديدة</span>
           <span className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3" /> الحقول المميزة بـ (*) إلزامية لإتمام الاستيراد</span>
           <span className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3" /> تواريخ بصيغة: YYYY-MM-DD أو DD/MM/YYYY</span>
-          <span className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3" /> يدعم xlsx, xls, csv — الصف الأول هو رأس الجدول</span>
+          <span className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3" /> يدعم xlsx, csv — الصف الأول هو رأس الجدول</span>
         </div>
       </div>
 

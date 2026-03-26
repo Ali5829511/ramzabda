@@ -73,7 +73,7 @@ async function extractTextFromPDF(file: File): Promise<string> {
       try {
         // Dynamic import to avoid SSR issues
         const { getDocument, GlobalWorkerOptions } = await import('pdfjs-dist');
-        GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
+        GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@4.10.38/build/pdf.worker.min.js`;
 
         const typedArray = new Uint8Array(e.target?.result as ArrayBuffer);
         const pdf = await getDocument({ data: typedArray }).promise;
