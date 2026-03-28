@@ -2,7 +2,8 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import {
   Home, Building2, FileText, Wrench, Megaphone, CreditCard, Users,
-  LogOut, Menu, Bell, TrendingUp, MapPin, X, CheckCheck, Clock, AlertTriangle, Sparkles
+  LogOut, Menu, Bell, TrendingUp, MapPin, X, CheckCheck, Clock, AlertTriangle, Sparkles,
+  Search, Heart, Settings, HelpCircle, User, ChevronDown
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -11,8 +12,10 @@ import api from '../lib/api'
 const navItems = [
   { path: '/', icon: Home, label: 'لوحة التحكم', roles: ['ADMIN', 'OWNER', 'AGENT', 'TENANT'] },
   { path: '/properties', icon: Building2, label: 'العقارات', roles: ['ADMIN', 'OWNER', 'AGENT'] },
+  { path: '/search', icon: Search, label: 'البحث المتقدم', roles: ['ADMIN', 'OWNER', 'AGENT', 'TENANT'] },
   { path: '/map', icon: MapPin, label: 'خريطة العقارات', roles: ['ADMIN', 'OWNER', 'AGENT', 'TENANT'] },
   { path: '/suggestions', icon: Sparkles, label: 'اقتراحات ذكية', roles: ['ADMIN', 'OWNER', 'AGENT', 'TENANT'] },
+  { path: '/favorites', icon: Heart, label: 'المفضلة', roles: ['ADMIN', 'OWNER', 'AGENT', 'TENANT'] },
   { path: '/listings', icon: Megaphone, label: 'التسويق العقاري', roles: ['ADMIN', 'OWNER', 'AGENT', 'TENANT'] },
   { path: '/contracts', icon: FileText, label: 'العقود', roles: ['ADMIN', 'OWNER', 'AGENT', 'TENANT'] },
   { path: '/maintenance', icon: Wrench, label: 'الصيانة', roles: ['ADMIN', 'OWNER', 'AGENT', 'TENANT'] },
@@ -111,6 +114,59 @@ function NotificationsPanel({ onClose }: { onClose: () => void }) {
   )
 }
 
+function UserMenu({ user, onLogout }: { user: any; onLogout: () => void }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  return (
+    <div className="hidden md:block relative" ref={ref}>
+      <button onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 pl-2 border-r border-gray-200 pr-3 mr-1 hover:bg-gray-50 rounded-lg py-1 transition-colors">
+        <div className="w-7 h-7 bg-gradient-to-br from-primary-500 to-primary-700 rounded-full flex items-center justify-center">
+          <span className="text-white font-bold text-xs">{user?.name?.[0]}</span>
+        </div>
+        <span className="text-sm font-medium text-gray-700">{user?.name}</span>
+        <ChevronDown size={14} className={`text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-full mt-2 w-52 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden py-1">
+          <Link to="/profile" onClick={() => setOpen(false)}
+            className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+            <User size={15} className="text-gray-400" /> الملف الشخصي
+          </Link>
+          <Link to="/notifications" onClick={() => setOpen(false)}
+            className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+            <Bell size={15} className="text-gray-400" /> الإشعارات
+          </Link>
+          <Link to="/settings" onClick={() => setOpen(false)}
+            className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+            <Settings size={15} className="text-gray-400" /> الإعدادات
+          </Link>
+          <Link to="/support" onClick={() => setOpen(false)}
+            className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+            <HelpCircle size={15} className="text-gray-400" /> الدعم
+          </Link>
+          <div className="border-t border-gray-100 mt-1 pt-1">
+            <button onClick={() => { setOpen(false); onLogout() }}
+              className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors w-full text-right">
+              <LogOut size={15} /> تسجيل الخروج
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function Layout() {
   const { user, logout } = useAuthStore()
   const location = useLocation()
@@ -192,6 +248,27 @@ export default function Layout() {
               <p className="text-xs text-gray-500 truncate">{user?.email}</p>
             </div>
           </div>
+          <div className="space-y-0.5 mb-2">
+            <Link to="/profile" onClick={() => setSidebarOpen(false)}
+              className="flex items-center gap-2 w-full px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-xl text-sm font-medium transition-colors">
+              <User size={15} /> الملف الشخصي
+            </Link>
+            <Link to="/notifications" onClick={() => setSidebarOpen(false)}
+              className="flex items-center gap-2 w-full px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-xl text-sm font-medium transition-colors">
+              <Bell size={15} /> الإشعارات
+              {unreadCount > 0 && (
+                <span className="mr-auto bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">{unreadCount}</span>
+              )}
+            </Link>
+            <Link to="/settings" onClick={() => setSidebarOpen(false)}
+              className="flex items-center gap-2 w-full px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-xl text-sm font-medium transition-colors">
+              <Settings size={15} /> الإعدادات
+            </Link>
+            <Link to="/support" onClick={() => setSidebarOpen(false)}
+              className="flex items-center gap-2 w-full px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-xl text-sm font-medium transition-colors">
+              <HelpCircle size={15} /> الدعم والمساعدة
+            </Link>
+          </div>
           <button onClick={handleLogout}
             className="flex items-center gap-2 w-full px-4 py-2.5 text-red-600 hover:bg-red-50 rounded-xl text-sm font-medium transition-colors">
             <LogOut size={16} />
@@ -219,12 +296,7 @@ export default function Layout() {
               </button>
               {notifOpen && <NotificationsPanel onClose={() => setNotifOpen(false)} />}
             </div>
-            <div className="hidden md:flex items-center gap-2 pl-2 border-r border-gray-200 pr-3 mr-1">
-              <div className="w-7 h-7 bg-gradient-to-br from-primary-500 to-primary-700 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-xs">{user?.name?.[0]}</span>
-              </div>
-              <span className="text-sm font-medium text-gray-700">{user?.name}</span>
-            </div>
+            <UserMenu user={user} onLogout={handleLogout} />
           </div>
         </header>
         <main className="flex-1 p-6 overflow-auto">
