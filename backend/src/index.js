@@ -15,6 +15,8 @@ const notificationRoutes = require('./routes/notifications');
 
 const app = express();
 
+const serverStartTime = new Date().toISOString();
+
 app.use(cors({
   origin: process.env.FRONTEND_URL || '*',
   credentials: true
@@ -35,7 +37,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/notifications', notificationRoutes);
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'رمز الإبداع - منصة إدارة الأملاك', version: '1.0.0' });
+  res.json({ status: 'OK', message: 'رمز الإبداع - منصة إدارة الأملاك', version: '1.0.0', startedAt: serverStartTime });
 });
 
 app.use((err, req, res, next) => {
