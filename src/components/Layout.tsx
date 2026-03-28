@@ -114,9 +114,9 @@ export default function Layout({ activePage, onNavigate, children }: Props) {
       <aside className={`${sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'} bg-white border-l border-gray-200 flex flex-col transition-all duration-300 shrink-0`}>
         <div className="p-4 border-b border-gray-100">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="رمز الإبداع" className="w-10 h-10 object-contain shrink-0" />
+            <img src="/logo.png" alt="شركة رمز الإبداع لإدارة الأملاك" className="w-12 h-12 object-contain shrink-0 bg-white rounded-xl p-1 border border-[color:theme('colors.brand.gold')]" />
             <div className="min-w-0">
-              <p className="text-sm font-bold text-gray-900 truncate">رمز الإبداع</p>
+              <p className="text-base font-black text-[color:theme('colors.brand.dark')] leading-tight truncate">شركة رمز الإبداع لإدارة الأملاك</p>
               <p className="text-xs text-gray-500">لإدارة الأملاك</p>
             </div>
           </div>

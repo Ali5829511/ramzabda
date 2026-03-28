@@ -8,13 +8,23 @@ export default {
     extend: {
       colors: {
         brand: {
-          gold: '#F5A623',
-          dark: '#1a1a2e',
-          light: '#FFF8EC',
-        }
+          gold: '#C9A44A', // الذهبي الأساسي
+          dark: '#1a1a2e', // الأسود الداكن
+          cream: '#F8F5EE', // الكريمي
+          beige: '#F2EDE4',
+          muted: '#6B6B6B',
+          section: '#EDE8DF',
+        },
+        accent: {
+          green: '#16a34a',
+          red: '#dc2626',
+          blue: '#3B82F6',
+          yellow: '#F5A623',
+        },
       },
       fontFamily: {
         arabic: ['Tajawal', 'Cairo', 'sans-serif'],
+        base: ['Segoe UI', 'Tahoma', 'Arial', 'sans-serif'],
       }
     },
   },
