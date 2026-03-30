@@ -1,0 +1,17 @@
+{
+  "$schema": "https://schema.railway.app/railway.json",
+  "services": {
+    "backend": {
+      "source": {
+        "repo": ".",
+        "rootDirectory": "backend"
+      }
+    },
+    "frontend": {
+      "source": {
+        "repo": ".",
+        "rootDirectory": "frontend"
+      }
+    }
+  }
+}
