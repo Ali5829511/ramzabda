@@ -15,6 +15,7 @@ const paymentRoutes = require('./routes/payments');
 const dashboardRoutes = require('./routes/dashboard');
 const userRoutes = require('./routes/users');
 const notificationRoutes = require('./routes/notifications');
+const whatsappRoutes = require('./routes/whatsapp');
 
 // ── Validate required environment variables ──────────────────────────────────
 const REQUIRED_ENV = ['DATABASE_URL', 'JWT_SECRET'];
@@ -51,6 +52,7 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/webhooks/whatsapp', whatsappRoutes);
 
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
