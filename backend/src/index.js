@@ -3,7 +3,6 @@ const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
-// ─── Routes ───────────────────────────────────────────────────────────────────
 const logger = require('./utils/logger');
 const { connectDatabase, disconnectDatabase } = require('./config/database');
 
@@ -17,14 +16,10 @@ const dashboardRoutes = require('./routes/dashboard');
 const userRoutes = require('./routes/users');
 const notificationRoutes = require('./routes/notifications');
 const docsRoutes = require('./routes/docs');
-
-// ─── Middleware ───────────────────────────────────────────────────────────────
-const { generalLimiter, authLimiter } = require('./middleware/rateLimiter');
-const { globalErrorHandler, notFoundHandler } = require('./utils/errorHandler');
-
-// ─── App ──────────────────────────────────────────────────────────────────────
-const app = express();
 const whatsappRoutes = require('./routes/whatsapp');
+
+const { generalLimiter, authLimiter } = require('./middleware/rateLimiter');
+const { notFoundHandler } = require('./utils/errorHandler');
 
 // ── Validate required environment variables ──────────────────────────────────
 const REQUIRED_ENV = ['DATABASE_URL', 'JWT_SECRET'];
@@ -37,31 +32,23 @@ if (missingEnv.length > 0) {
 const PORT = process.env.PORT || 5000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const FRONTEND_URL = process.env.FRONTEND_URL || '*';
-
-const app = express();
 const serverStartTime = new Date().toISOString();
 
-// CORS
+const app = express();
+
 // ── Middleware ────────────────────────────────────────────────────────────────
 app.use(cors({
   origin: FRONTEND_URL,
   credentials: true,
 }));
-
-// Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Static files
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// ─── Rate Limiting ────────────────────────────────────────────────────────────
-// Stricter limit on auth endpoints to slow brute-force attacks
+// ── Rate Limiting ─────────────────────────────────────────────────────────────
 app.use('/api/auth', authLimiter);
-// General limit for all other API routes
 app.use('/api', generalLimiter);
 
-// ─── API Routes ───────────────────────────────────────────────────────────────
 // ── Routes ────────────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 app.use('/api/properties', propertyRoutes);
@@ -73,8 +60,6 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/docs', docsRoutes);
-
-// ─── Health Check ─────────────────────────────────────────────────────────────
 app.use('/api/webhooks/whatsapp', whatsappRoutes);
 
 // ── Health check ──────────────────────────────────────────────────────────────
@@ -88,17 +73,8 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// ─── 404 Handler (must come after all routes) ─────────────────────────────────
+// ── 404 / Global error handlers ───────────────────────────────────────────────
 app.use(notFoundHandler);
-
-// ─── Global Error Handler (must be last) ─────────────────────────────────────
-app.use(globalErrorHandler);
-
-// ─── Start Server ─────────────────────────────────────────────────────────────
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-// ── Global error handler ──────────────────────────────────────────────────────
 app.use((err, req, res, next) => {
   logger.error(`Unhandled error on ${req.method} ${req.path}`, err);
   res.status(err.status || 500).json({
