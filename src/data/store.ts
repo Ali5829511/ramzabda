@@ -213,7 +213,7 @@ export const useStore = create<AppState>()(
       deleteAdLicense: (id) => set(s => ({ adLicenses: s.adLicenses.filter(l => l.id !== id) })),
 
       addSupportTicket: (t) => set(s => ({ supportTickets: [...s.supportTickets, t] })),
-      updateSupportTicket: (id: string, data: any) => set(s => ({ supportTickets: s.supportTickets.map(t => t.id === id ? { ...t, ...data } : t) })),
+      updateSupportTicket: (id: string, data: Partial<SupportTicket>) => set(s => ({ supportTickets: s.supportTickets.map(t => t.id === id ? { ...t, ...data } : t) })),
       deleteSupportTicket: (id: string) => set(s => ({ supportTickets: s.supportTickets.filter(t => t.id !== id) })),
 
       addUser: (u) => set(s => ({ users: [...s.users, u] })),

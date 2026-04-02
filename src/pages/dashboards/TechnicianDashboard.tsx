@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useStore } from '../../data/store';
+import type { MaintenanceRequest } from '../../types';
 import {
   Wrench, Clock, CheckCircle, AlertCircle,
   MapPin, Star, Eye, Play
@@ -43,7 +44,7 @@ export default function TechnicianDashboard() {
     PRIORITY_CONFIG[m.priority]?.label === filter || m.category === filter
   ) : displayed;
 
-  const getProperty = (m: any) => {
+  const getProperty = (m: { unitId?: string; category?: string; priority?: string }) => {
     const unit = units.find(u => u.id === m.unitId);
     const prop = unit ? properties.find(p => p.id === unit.propertyId) : null;
     return { unit, property: prop };
@@ -51,7 +52,7 @@ export default function TechnicianDashboard() {
 
   const updateStatus = (id: string, status: string) => {
     updateMaintenanceRequest(id, {
-      status: status as any,
+      status: status as MaintenanceRequest['status'],
       ...(status === 'completed' ? {
         technicianNotes: notes,
         actualCost: parseFloat(cost) || 0,

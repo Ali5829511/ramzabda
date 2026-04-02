@@ -261,7 +261,7 @@ export interface PriceQuote {
   total: number;
   notes?: string;
   fileUrl?: string;
-  ownerApproval?: 'pending' | 'approved' | 'rejected';
+  ownerApproval?: 'pending' | 'approved' | 'rejected' | 'not_required';
   ownerApprovalNote?: string;
   ownerApprovedAt?: string;
   tenantApproval?: 'pending' | 'approved' | 'not_required';

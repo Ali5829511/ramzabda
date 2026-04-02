@@ -65,9 +65,9 @@ export function useLinkedData() {
 // Smart alerts based on real data
 export function useSmartAlerts() {
   const { contracts, invoices, installments, maintenanceRequests } = useStore();
-  const today = new Date();
 
   const alerts = useMemo(() => {
+    const today = new Date();
     const list: {
       id: string; type: 'warning' | 'danger' | 'info'; title: string;
       detail: string; category: 'contract' | 'invoice' | 'maintenance';

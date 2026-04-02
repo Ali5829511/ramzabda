@@ -313,7 +313,7 @@ function ConfigModal({ intg, onClose }: { intg: Integration; onClose: () => void
                   {f.type === 'select' ? (
                     <select className="input-field text-sm" value={values[f.key] ?? ''} onChange={e => set(f.key, e.target.value)}>
                       <option value="">— اختر —</option>
-                      {(f as any).options?.map((o: string) => <option key={o} value={o}>{o}</option>)}
+                      {(f as { options?: string[] }).options?.map((o: string) => <option key={o} value={o}>{o}</option>)}
                     </select>
                   ) : (
                     <div className="relative">

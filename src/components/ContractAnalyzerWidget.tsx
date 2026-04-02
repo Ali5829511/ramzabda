@@ -58,7 +58,7 @@ async function extractTextFromFile(file: File): Promise<string> {
           for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
             const content = await page.getTextContent();
-            fullText += content.items.map((item: any) => item.str).join(' ') + '\n';
+            fullText += content.items.filter(item => 'str' in item).map(item => (item as { str: string }).str).join(' ') + '\n';
           }
           resolve(fullText || 'EMPTY_PDF');
         } catch {
@@ -91,7 +91,7 @@ function parseContract(text: string): ExtractedContractData {
   };
   const normalizeDate = (d?: string): string | undefined => {
     if (!d) return undefined;
-    const parts = d.split(/[\/\-\.]/);
+    const parts = d.split(/[/\-.]/);
     if (parts.length === 3) {
       const [a, b, c] = parts;
       if (c.length === 4) return `${c}-${b.padStart(2,'0')}-${a.padStart(2,'0')}`;
@@ -101,16 +101,16 @@ function parseContract(text: string): ExtractedContractData {
   };
 
   data.contractNumber = find([
-    /رقم\s*العقد[:\s]+([A-Z0-9\-\/]+)/,
-    /Contract\s*(?:No|Number)[.:\s]+([A-Z0-9\-]+)/i,
-    /عقد\s*رقم[:\s]+([A-Z0-9\-\/]+)/,
-    /(\d{4}[-\/]\d{5,})/,
+    /رقم\s*العقد[:\s]+([A-Z0-9\-/]+)/,
+    /Contract\s*(?:No|Number)[.:\s]+([A-Z0-9-]+)/i,
+    /عقد\s*رقم[:\s]+([A-Z0-9\-/]+)/,
+    /(\d{4}[-/]\d{5,})/,
   ]);
 
   data.ejarContractId = find([
-    /رقم\s*الطلب[:\s]+([A-Z0-9\-]+)/,
-    /Ejar\s*(?:ID|Contract)[:\s]+([A-Z0-9\-]+)/i,
-    /منصة\s*إيجار[:\s]+([A-Z0-9\-]+)/,
+    /رقم\s*الطلب[:\s]+([A-Z0-9-]+)/,
+    /Ejar\s*(?:ID|Contract)[:\s]+([A-Z0-9-]+)/i,
+    /منصة\s*إيجار[:\s]+([A-Z0-9-]+)/,
   ]);
 
   data.versionNumber = find([
@@ -119,17 +119,17 @@ function parseContract(text: string): ExtractedContractData {
   ]);
 
   data.contractStartDate = normalizeDate(find([
-    /تاريخ\s*(?:بداية|البداية|بدء|البدء)\s*العقد[:\s]+(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/,
-    /تاريخ\s*البدء[:\s]+(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/,
-    /من\s*تاريخ[:\s]+(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/,
-    /Start\s*Date[:\s]+(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/i,
+    /تاريخ\s*(?:بداية|البداية|بدء|البدء)\s*العقد[:\s]+(\d{1,2}[/\-.]\d{1,2}[/\-.]\d{4})/,
+    /تاريخ\s*البدء[:\s]+(\d{1,2}[/\-.]\d{1,2}[/\-.]\d{4})/,
+    /من\s*تاريخ[:\s]+(\d{1,2}[/\-.]\d{1,2}[/\-.]\d{4})/,
+    /Start\s*Date[:\s]+(\d{1,2}[/\-.]\d{1,2}[/\-.]\d{4})/i,
   ]));
 
   data.contractEndDate = normalizeDate(find([
-    /تاريخ\s*(?:نهاية|الانتهاء|النهاية|انتهاء)\s*العقد[:\s]+(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/,
-    /تاريخ\s*الانتهاء[:\s]+(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/,
-    /إلى\s*تاريخ[:\s]+(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/,
-    /End\s*Date[:\s]+(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/i,
+    /تاريخ\s*(?:نهاية|الانتهاء|النهاية|انتهاء)\s*العقد[:\s]+(\d{1,2}[/\-.]\d{1,2}[/\-.]\d{4})/,
+    /تاريخ\s*الانتهاء[:\s]+(\d{1,2}[/\-.]\d{1,2}[/\-.]\d{4})/,
+    /إلى\s*تاريخ[:\s]+(\d{1,2}[/\-.]\d{1,2}[/\-.]\d{4})/,
+    /End\s*Date[:\s]+(\d{1,2}[/\-.]\d{1,2}[/\-.]\d{4})/i,
   ]));
 
   data.annualRent = findNum([
@@ -164,8 +164,8 @@ function parseContract(text: string): ExtractedContractData {
   ]);
 
   data.brokerageAgreementNumber = find([
-    /رقم\s*(?:اتفاقية|عقد)\s*الوساطة[:\s]+([A-Z0-9\-\/]+)/,
-    /Brokerage\s*(?:Agreement|Contract)[:\s]+([A-Z0-9\-]+)/i,
+    /رقم\s*(?:اتفاقية|عقد)\s*الوساطة[:\s]+([A-Z0-9\-/]+)/,
+    /Brokerage\s*(?:Agreement|Contract)[:\s]+([A-Z0-9-]+)/i,
   ]);
 
   data.paymentFrequency = find([
@@ -177,7 +177,7 @@ function parseContract(text: string): ExtractedContractData {
     /اسم\s*المستأجر[:\s]+([^\n\r،,\-—]+)/,
     /الطرف\s*الثاني[:\s]+([^\n\r،\-—]+)/,
     /Tenant\s*Name[:\s]+([^\n\r,]+)/i,
-    /المستأجر[:\s]+([^\n\r،,—\-]+)/,
+    /المستأجر[:\s]+([^\n\r،,—-]+)/,
   ])?.replace(/\s+/g, ' ');
 
   data.tenantNationalId = find([
@@ -188,8 +188,8 @@ function parseContract(text: string): ExtractedContractData {
   ]);
 
   data.tenantPhone = find([
-    /جوال\s*المستأجر[:\s]+([\d+\s\-]{10,})/,
-    /هاتف\s*المستأجر[:\s]+([\d+\s\-]{10,})/,
+    /جوال\s*المستأجر[:\s]+([\d+\s-]{10,})/,
+    /هاتف\s*المستأجر[:\s]+([\d+\s-]{10,})/,
     /\b(05\d{8})\b/,
   ]);
 
@@ -202,7 +202,7 @@ function parseContract(text: string): ExtractedContractData {
     /اسم\s*(?:المالك|المؤجر)[:\s]+([^\n\r،,\-—]+)/,
     /الطرف\s*الأول[:\s]+([^\n\r،\-—]+)/,
     /Landlord\s*Name[:\s]+([^\n\r,]+)/i,
-    /المالك[:\s]+([^\n\r،,—\-]+)/,
+    /المالك[:\s]+([^\n\r،,—-]+)/,
   ])?.replace(/\s+/g, ' ');
 
   data.landlordNationalId = find([
@@ -211,8 +211,8 @@ function parseContract(text: string): ExtractedContractData {
   ]);
 
   data.landlordPhone = find([
-    /جوال\s*(?:المالك|المؤجر)[:\s]+([\d+\s\-]{10,})/,
-    /هاتف\s*(?:المالك|المؤجر)[:\s]+([\d+\s\-]{10,})/,
+    /جوال\s*(?:المالك|المؤجر)[:\s]+([\d+\s-]{10,})/,
+    /هاتف\s*(?:المالك|المؤجر)[:\s]+([\d+\s-]{10,})/,
   ]);
 
   data.landlordIban = find([
@@ -222,14 +222,14 @@ function parseContract(text: string): ExtractedContractData {
   ]);
 
   data.titleDeedNumber = find([
-    /رقم\s*(?:الصك|وثيقة\s*الملكية)[:\s]+([A-Z0-9\-\/]+)/,
-    /Deed\s*Number[:\s]+([A-Z0-9\-]+)/i,
-    /صك\s*رقم[:\s]+([A-Z0-9\-\/]+)/,
+    /رقم\s*(?:الصك|وثيقة\s*الملكية)[:\s]+([A-Z0-9\-/]+)/,
+    /Deed\s*Number[:\s]+([A-Z0-9-]+)/i,
+    /صك\s*رقم[:\s]+([A-Z0-9\-/]+)/,
   ]);
 
   data.unitNumber = find([
-    /رقم\s*الوحدة[:\s]+([A-Z0-9\-\/]+)/,
-    /Unit\s*(?:No|Number)[:\s]+([A-Z0-9\-]+)/i,
+    /رقم\s*الوحدة[:\s]+([A-Z0-9\-/]+)/,
+    /Unit\s*(?:No|Number)[:\s]+([A-Z0-9-]+)/i,
     /الشقة\s*رقم[:\s]+(\d+)/,
   ]);
 
@@ -266,8 +266,8 @@ function parseContract(text: string): ExtractedContractData {
   ])?.replace(/\s+/g, ' ');
 
   data.brokerLicense = find([
-    /(?:رقم\s*)?رخصة\s*الوسيط[:\s]+([A-Z0-9\-\/]+)/,
-    /Broker\s*License[:\s]+([A-Z0-9\-]+)/i,
+    /(?:رقم\s*)?رخصة\s*الوسيط[:\s]+([A-Z0-9\-/]+)/,
+    /Broker\s*License[:\s]+([A-Z0-9-]+)/i,
   ]);
 
   // Brokerage specific

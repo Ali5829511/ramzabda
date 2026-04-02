@@ -2,10 +2,9 @@ import { useState, useMemo } from 'react';
 import { useStore, generateId } from '../../data/store';
 import {
   Shield, Plus, Edit, Trash2, Printer, Search, CheckCircle,
-  Clock, AlertTriangle, XCircle, Eye, MessageCircle, FileText,
-  Building2, MapPin, User, Award, Hash, Calendar, DollarSign,
-  Globe, Megaphone, Copy, RefreshCw, ChevronDown, ChevronUp,
-  BarChart2, TrendingUp, Zap, ExternalLink
+  Clock, AlertTriangle, XCircle, Eye, FileText,
+  Building2, MapPin, User, Award, Calendar, DollarSign,
+  Globe, RefreshCw, ChevronDown, ChevronUp, ExternalLink
 } from 'lucide-react';
 import type { AdLicense } from '../../types';
 

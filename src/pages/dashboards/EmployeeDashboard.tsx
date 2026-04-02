@@ -2,10 +2,9 @@ import { useState } from 'react';
 import { useStore } from '../../data/store';
 import {
   Users, Calendar, Building2, FileText, Wrench, TrendingUp,
-  DollarSign, Bell, CheckCircle, AlertCircle, Clock, Star,
-  Phone, MessageCircle, Plus, ChevronRight, Eye, Filter,
-  Target, BarChart2, Home, MapPin, Search, Activity,
-  ArrowUpRight, ArrowDownRight, Briefcase, UserCheck,
+  DollarSign, Bell, CheckCircle, AlertCircle,
+  Phone, ChevronRight,
+  Target, BarChart2, Home, Search, Activity, UserCheck,
   ClipboardList, PieChart
 } from 'lucide-react';
 

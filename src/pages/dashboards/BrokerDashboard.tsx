@@ -1,5 +1,5 @@
 import { useStore } from '../../data/store';
-import { Users, Calendar, Megaphone, DollarSign, TrendingUp, Eye } from 'lucide-react';
+import { Users, Calendar, Megaphone, Eye } from 'lucide-react';
 
 export default function BrokerDashboard() {
   const { currentUser, customers, appointments, marketingListings } = useStore();

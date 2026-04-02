@@ -110,7 +110,7 @@ export default function PropertiesPage() {
     p.region.includes(search) || p.titleDeedNumber.includes(search)
   );
 
-  const set = (key: keyof FormType, val: any) => setForm(f => ({ ...f, [key]: val }));
+  const set = (key: keyof FormType, val: FormType[keyof FormType]) => setForm(f => ({ ...f, [key]: val }));
 
   const resetForm = () => { setForm({ ...EMPTY_FORM }); setEditing(null); setOpenSection('basic'); };
 

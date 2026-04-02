@@ -1,9 +1,9 @@
 import { useState, useRef } from 'react';
 import { useStore, generateId } from '../../data/store';
 import {
-  Archive, Upload, Search, Filter, File, FileText, Image, Download,
-  Trash2, Eye, FolderOpen, Plus, Tag, Calendar, Building2,
-  AlertCircle, CheckCircle, Clock, ExternalLink, ChevronDown
+  Archive, Upload, Search,
+  Trash2, Eye, FolderOpen, Plus, Calendar,
+  AlertCircle, Clock
 } from 'lucide-react';
 
 interface Document {

@@ -3,13 +3,12 @@ import { useStore } from '../../data/store';
 import {
   Building2, Home, FileText, Wrench, Users, DollarSign, Calendar, AlertCircle,
   TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Minus,
-  CheckCircle, Clock, AlertTriangle, Target, Award, Zap,
-  BarChart2, PieChart as PieIcon, Activity, RefreshCw, Eye,
-  ChevronRight, Star, Filter
+  CheckCircle, Clock, AlertTriangle, Target, Zap,
+  BarChart2, PieChart as PieIcon, Activity, Star
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, LineChart, Line, AreaChart, Area, Legend
+  PieChart, Pie, Cell, Legend
 } from 'recharts';
 
 const COLORS = ['#F59E0B', '#10B981', '#3B82F6', '#EF4444', '#8B5CF6', '#EC4899'];
@@ -194,7 +193,7 @@ export default function AdminDashboard() {
     })),
   ].sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 8);
 
-  const openTickets = (supportTickets || []).filter((t: any) => t.status !== 'closed' && t.status !== 'resolved').length;
+  const openTickets = (supportTickets || []).filter((t: { status: string }) => t.status !== 'closed' && t.status !== 'resolved').length;
 
   return (
     <div className="space-y-6">

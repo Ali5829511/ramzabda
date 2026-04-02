@@ -99,6 +99,7 @@ const channelIcons: Record<string, string> = {
 
 // SLA hours by priority
 const slHours: Record<string, number> = { low: 72, medium: 48, high: 24, urgent: 4 };
+const priorityOrder: Record<string, number> = { urgent: 0, high: 1, medium: 2, low: 3 };
 
 function getSlaStatus(ticket: SupportTicket): 'ok' | 'warning' | 'breached' {
   if (ticket.status === 'resolved' || ticket.status === 'closed') return 'ok';
@@ -319,7 +320,7 @@ function TicketDetail({ ticket, onClose, onUpdate }: {
       status,
       assignedTo: assignedTo || undefined,
       priority,
-      satisfactionRating: rating as any,
+      satisfactionRating: rating as SupportTicket['satisfactionRating'],
       satisfactionNote: ratingNote || undefined,
       escalationReason: escalationReason || undefined,
       updatedAt: new Date().toISOString(),
@@ -423,13 +424,13 @@ function TicketDetail({ ticket, onClose, onUpdate }: {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             <div>
               <label className="label">الحالة</label>
-              <select className="input-field text-sm" value={status} onChange={e => setStatus(e.target.value as any)}>
+              <select className="input-field text-sm" value={status} onChange={e => setStatus(e.target.value as SupportTicket['status'])}>
                 {Object.entries(statusLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select>
             </div>
             <div>
               <label className="label">الأولوية</label>
-              <select className="input-field text-sm" value={priority} onChange={e => setPriority(e.target.value as any)}>
+              <select className="input-field text-sm" value={priority} onChange={e => setPriority(e.target.value as SupportTicket['priority'])}>
                 {Object.entries(priorityLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select>
             </div>
@@ -465,7 +466,7 @@ function TicketDetail({ ticket, onClose, onUpdate }: {
               <p className="text-sm font-bold text-yellow-800 mb-3 flex items-center gap-2">
                 <Star className="w-4 h-4" /> تقييم رضا العميل
               </p>
-              <StarRating value={rating} onChange={v => setRating(v as any)} />
+              <StarRating value={rating} onChange={v => setRating(v)} />
               <input className="input-field text-sm mt-3" value={ratingNote}
                 onChange={e => setRatingNote(e.target.value)}
                 placeholder="ملاحظة العميل (اختياري)..." />
@@ -654,7 +655,7 @@ function TicketForm({ editing, onSave, onClose }: {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="label">الفئة *</label>
-              <select className="input-field text-sm" value={form.category} onChange={e => set({ category: e.target.value as any })}>
+              <select className="input-field text-sm" value={form.category} onChange={e => set({ category: e.target.value as SupportTicket['category'] })}>
                 {Object.entries(categoryLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select>
             </div>
@@ -665,13 +666,13 @@ function TicketForm({ editing, onSave, onClose }: {
             </div>
             <div>
               <label className="label">الأولوية</label>
-              <select className="input-field text-sm" value={form.priority} onChange={e => set({ priority: e.target.value as any })}>
+              <select className="input-field text-sm" value={form.priority} onChange={e => set({ priority: e.target.value as SupportTicket['priority'] })}>
                 {Object.entries(priorityLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select>
             </div>
             <div>
               <label className="label">قناة الاستقبال</label>
-              <select className="input-field text-sm" value={form.channel} onChange={e => set({ channel: e.target.value as any })}>
+              <select className="input-field text-sm" value={form.channel} onChange={e => set({ channel: e.target.value as SupportTicket['channel'] })}>
                 {Object.entries(channelLabels).map(([v, l]) => <option key={v} value={v}>{channelIcons[v]} {l}</option>)}
               </select>
             </div>
@@ -759,8 +760,6 @@ export default function TicketsPage() {
   const myTickets = currentUser?.role === 'tenant'
     ? supportTickets.filter(t => t.customerPhone === currentUser.phone || t.customerId === currentUser.id)
     : supportTickets;
-
-  const priorityOrder: Record<string, number> = { urgent: 0, high: 1, medium: 2, low: 3 };
 
   const filtered = useMemo(() => {
     let list = myTickets
@@ -929,7 +928,7 @@ export default function TicketsPage() {
             ))}
           </select>
         )}
-        <select className="input-field w-36" value={sortBy} onChange={e => setSortBy(e.target.value as any)}>
+        <select className="input-field w-36" value={sortBy} onChange={e => setSortBy(e.target.value as 'createdAt' | 'priority' | 'updatedAt')}>
           <option value="createdAt">الأحدث أولاً</option>
           <option value="updatedAt">آخر تحديث</option>
           <option value="priority">حسب الأولوية</option>

@@ -564,7 +564,7 @@ function CampaignsTab() {
                 {(['impressions','clicks','leads','conversions'] as const).map(f => (
                   <div key={f}>
                     <label className="label text-xs">{{ impressions:'مشاهدات', clicks:'نقرات', leads:'فرص', conversions:'تحويل' }[f]}</label>
-                    <input type="number" min="0" className="input-field" value={(form as any)[f]||''} onChange={e => setForm({...form, [f]: +e.target.value})} />
+                    <input type="number" min="0" className="input-field" value={form[f]||''} onChange={e => setForm({...form, [f]: +e.target.value})} />
                   </div>
                 ))}
               </div>

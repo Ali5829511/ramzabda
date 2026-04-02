@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { useStore } from '../data/store';
 import {
-  Building2, LayoutDashboard, Home, FileText, Wrench,
-  Users, Calendar, Megaphone, FileStack, Settings, ClipboardList, Calculator,
-  Bell, LogOut, ChevronDown, ChevronRight, Menu, X,
-  DollarSign, UserCheck, Briefcase, Star, TrendingUp,
-  Search, AlertCircle, AlertTriangle, Info, FileWarning, Link2, Ticket, FileSpreadsheet,
-  Archive, MapPin, Bot, Target, CreditCard
+   LayoutDashboard, Home, FileText, Wrench,
+  Users, Megaphone, FileStack, Settings, ClipboardList, Calculator, LogOut, ChevronDown, ChevronRight, Menu, X,
+  DollarSign, UserCheck, Briefcase, TrendingUp,
+  Search, FileWarning, Link2, Ticket, FileSpreadsheet,
+  Archive, MapPin, Target, CreditCard
 } from 'lucide-react';
 import NotificationCenter from './NotificationCenter';
 import type { UserRole } from '../types';

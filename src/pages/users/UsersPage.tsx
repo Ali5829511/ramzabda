@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useStore, generateId } from '../../data/store';
-import { Plus, User, Edit, UserCheck, UserX } from 'lucide-react';
+import { Plus, Edit } from 'lucide-react';
 import type { User as UserType } from '../../types';
 
 const roleLabels: Record<string, string> = {

@@ -4,12 +4,11 @@ import type { AppState } from '../../data/store';
 import type { MaintenanceRequest, MaintenanceStatusHistory, PriceQuote, QuoteItem } from '../../types';
 import {
   Wrench, Plus, Edit, Trash2, CheckCircle, Clock, AlertTriangle, XCircle,
-  User, Phone, Building2, Search, BarChart2, Star, Printer,
-  ChevronDown, ChevronUp, Calendar, DollarSign, MessageSquare, ArrowRight,
+  User, Building2, Search, BarChart2, Star,
+  ChevronDown, ChevronUp, Calendar, DollarSign, MessageSquare,
   TrendingUp, Eye, ThumbsUp, ThumbsDown, Smartphone, MessageCircle,
-  Home, Shield, UserCheck, Send, FileText, AlertCircle,
-  Zap, RefreshCw, ClipboardList, MapPin, Hash, ChevronRight,
-  Upload, FileCheck, Receipt, PlusCircle, Minus
+  Home, Shield, UserCheck, Send, FileText,
+  Zap, ClipboardList, MapPin, Hash, ChevronRight, FileCheck, Receipt, PlusCircle, Minus
 } from 'lucide-react';
 
 // ─── Constants ────────────────────────────────────────────────
@@ -304,7 +303,7 @@ function AddQuoteInline({ req, onUpdate, now, addHistory, currentUser }: {
   onUpdate: (id: string, data: Partial<MaintenanceRequest>) => void;
   now: () => string;
   addHistory: (status: MaintenanceRequest['status'], note?: string) => MaintenanceStatusHistory[];
-  currentUser: any;
+  currentUser: { id?: string; name?: string } | null;
 }) {
   const [open, setOpen] = useState(false);
   const [company, setCompany] = useState('');
@@ -331,7 +330,7 @@ function AddQuoteInline({ req, onUpdate, now, addHistory, currentUser }: {
       subtotal, vat, vatAmount: vatAmt, total,
       notes: notes || undefined,
       fileUrl: fileUrl || undefined,
-      ownerApproval: req.ownerApprovalStatus === 'approved' ? 'not_required' as any : 'pending',
+      ownerApproval: req.ownerApprovalStatus === 'approved' ? 'not_required' as PriceQuote['ownerApproval'] : 'pending',
       tenantApproval: 'pending',
     };
     const updated = [...(req.priceQuotes ?? []), quote];
@@ -849,7 +848,6 @@ function RequestForm({ editing, onSave, onClose }: {
 
   const canNext1 = !!propertyId && !!unitId;
   const canNext2 = !!title.trim() && !!description.trim();
-  const canNext3 = !hasQuote || (quoteItems.some(it => it.description && it.total > 0));
 
   const handleSubmit = () => {
     const now = new Date().toISOString();
@@ -869,7 +867,7 @@ function RequestForm({ editing, onSave, onClose }: {
         total: quoteTotal,
         notes: quoteNotes || undefined,
         fileUrl: quoteFileUrl || undefined,
-        ownerApproval: needsOwnerApproval ? 'pending' : 'not_required' as any,
+        ownerApproval: needsOwnerApproval ? 'pending' : 'not_required' as PriceQuote['ownerApproval'],
         tenantApproval: 'not_required',
       };
     }
@@ -889,7 +887,7 @@ function RequestForm({ editing, onSave, onClose }: {
       priceQuotes: quote ? [quote] : undefined,
       activeQuoteId: quote?.id,
       needsOwnerApproval,
-    } as any);
+    } as Partial<MaintenanceRequest>);
   };
 
   return (
@@ -1002,7 +1000,7 @@ function RequestForm({ editing, onSave, onClose }: {
                   <label className="label">فئة الصيانة *</label>
                   <div className="grid grid-cols-3 gap-1.5 mt-1">
                     {Object.entries(categoryLabels).map(([v, l]) => (
-                      <button key={v} type="button" onClick={() => setCategory(v as any)}
+                      <button key={v} type="button" onClick={() => setCategory(v as MaintenanceRequest['category'])}
                         className={`flex flex-col items-center gap-1 py-2 rounded-xl border-2 text-xs font-semibold transition-all ${category === v ? 'border-orange-500 bg-orange-50 text-orange-700' : 'border-gray-200 hover:border-orange-200 text-gray-600'}`}>
                         <span className="text-base">{categoryIcons[v]}</span>
                         {l}
@@ -1015,7 +1013,7 @@ function RequestForm({ editing, onSave, onClose }: {
                     <label className="label">درجة الأولوية *</label>
                     <div className="grid grid-cols-2 gap-1.5 mt-1">
                       {Object.entries(priorityLabels).map(([v, l]) => (
-                        <button key={v} type="button" onClick={() => setPriority(v as any)}
+                        <button key={v} type="button" onClick={() => setPriority(v as MaintenanceRequest['priority'])}
                           className={`py-2 rounded-xl border-2 text-xs font-bold transition-all ${priority === v ? `border-orange-500 ${priorityColors[v]}` : 'border-gray-200 text-gray-600 hover:border-orange-200'}`}>
                           {v === 'urgent' ? '🔴' : v === 'high' ? '🟠' : v === 'medium' ? '🟡' : '🟢'} {l}
                         </button>
@@ -1024,7 +1022,7 @@ function RequestForm({ editing, onSave, onClose }: {
                   </div>
                   <div>
                     <label className="label">مصدر البلاغ</label>
-                    <select className="input-field text-sm" value={requestSource} onChange={e => setRequestSource(e.target.value as any)}>
+                    <select className="input-field text-sm" value={requestSource} onChange={e => setRequestSource(e.target.value as MaintenanceRequest['requestSource'])}>
                       {Object.entries(sourceLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                     </select>
                   </div>
@@ -1389,7 +1387,7 @@ export default function MaintenancePage() {
     if (editing) {
       updateMaintenanceRequest(editing.id, { ...data, });
     } else {
-      const needsApproval = (data as any).needsOwnerApproval !== false;
+      const needsApproval = (data as Partial<MaintenanceRequest> & { needsOwnerApproval?: boolean }).needsOwnerApproval !== false;
       const initialStatus: MaintenanceRequest['status'] = needsApproval ? 'pending_approval' : 'new';
       const req: MaintenanceRequest = {
         id: generateId(),
@@ -1449,7 +1447,7 @@ export default function MaintenancePage() {
       {/* Tabs */}
       <div className="flex gap-1 flex-wrap border-b border-gray-200 pb-1">
         {tabs.map(tab => (
-          <button key={tab.id} onClick={() => setActiveTab(tab.id as any)}
+          <button key={tab.id} onClick={() => setActiveTab(tab.id as typeof activeTab)}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-t-xl text-xs font-semibold transition-colors relative ${activeTab === tab.id ? 'bg-orange-500 text-white shadow' : 'text-gray-600 hover:bg-orange-50'}`}>
             {tab.icon} {tab.label}
             {(tab.badge ?? 0) > 0 && (
