@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import api from '../lib/api'
 import toast from 'react-hot-toast'
@@ -65,6 +65,12 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-6 pt-6 border-t border-gray-100">
+            <p className="text-sm text-gray-600 text-center mb-4">
+              ليس لديك حساب؟{' '}
+              <Link to="/register" className="text-primary-600 font-semibold hover:text-primary-700">
+                إنشاء حساب جديد
+              </Link>
+            </p>
             <p className="text-xs text-gray-500 text-center mb-3">بيانات تجريبية:</p>
             <div className="space-y-1 text-xs text-gray-500 text-center">
               <p>مدير: admin@ramzabda.com / admin123</p>

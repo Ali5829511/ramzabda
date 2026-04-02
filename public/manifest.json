@@ -1,0 +1,29 @@
+{
+  "name": "رمز الإبداع لإدارة الأملاك",
+  "short_name": "رمز الإبداع",
+  "description": "منصة تشغيل عقاري متكاملة — إدارة الأملاك والصيانة والتسويق",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F8F5EE",
+  "theme_color": "#C9A44A",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    { "src": "/logo.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "العقارات", "url": "/?page=properties", "description": "إدارة العقارات" },
+    { "name": "الصيانة", "url": "/?page=maintenance", "description": "بلاغات الصيانة" },
+    { "name": "العقود", "url": "/?page=contracts", "description": "عقود الإيجار" },
+    { "name": "التقارير", "url": "/?page=reports", "description": "التقارير والإحصائيات" }
+  ],
+  "screenshots": [
+    { "src": "/logo.png", "sizes": "1280x720", "type": "image/png", "form_factor": "wide" }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": []
+}
