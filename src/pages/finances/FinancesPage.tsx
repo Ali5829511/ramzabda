@@ -1,9 +1,9 @@
 import { useStore } from '../../data/store';
 import { DollarSign, TrendingUp, TrendingDown, BarChart2 } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function FinancesPage() {
-  const { payments, expenses, contracts, properties, units, currentUser } = useStore();
+  const { payments, expenses, contracts, properties, currentUser } = useStore();
 
   const myProperties = currentUser?.role === 'owner'
     ? properties.filter(p => p.ownerId === currentUser.id)
@@ -19,7 +19,7 @@ export default function FinancesPage() {
   const totalExpenses = myExpenses.reduce((s, e) => s + e.amount, 0);
   const netProfit = totalRevenue - totalExpenses;
 
-  const monthly = ['أكتوبر', 'نوفمبر', 'ديسمبر', 'يناير', 'فبراير', 'مارس'].map((month, i) => ({
+  const monthly = ['أكتوبر', 'نوفمبر', 'ديسمبر', 'يناير', 'فبراير', 'مارس'].map((month) => ({
     month,
     إيرادات: (totalRevenue / 6) * (0.8 + Math.random() * 0.4) | 0,
     مصروفات: (totalExpenses / 6) * (0.7 + Math.random() * 0.6) | 0,

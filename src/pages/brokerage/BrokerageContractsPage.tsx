@@ -1,11 +1,9 @@
 import { useState, useMemo } from 'react';
 import { useStore, generateId } from '../../data/store';
 import {
-  FileText, Plus, Edit, Trash2, Printer, Eye, CheckCircle,
-  Clock, XCircle, AlertTriangle, Search, User, Building2,
-  Phone, Mail, CreditCard, Shield, Star, DollarSign,
-  Calendar, Hash, MapPin, Award, ChevronDown, ChevronUp,
-  Copy, ExternalLink, TrendingUp, BarChart2, RefreshCw
+  FileText, Plus, Edit, Trash2, Printer, CheckCircle,
+  Clock, AlertTriangle, Search, User, Building2, Shield, Star, DollarSign,
+  Calendar, Hash, MapPin, Award, ChevronDown, ChevronUp, TrendingUp
 } from 'lucide-react';
 import type { BrokerageContract } from '../../types';
 import { ContractAnalyzerWidget, type ExtractedContractData } from '../../components/ContractAnalyzerWidget';
@@ -67,7 +65,6 @@ function KpiCard({ label, value, icon, color, sub }: {
 function printContract(c: BrokerageContract) {
   const win = window.open('', '_blank');
   if (!win) return;
-  const daysLeft = Math.ceil((new Date(c.endDate).getTime() - Date.now()) / 86400000);
   win.document.write(`<!DOCTYPE html><html dir="rtl" lang="ar"><head>
     <meta charset="UTF-8">
     <title>عقد وساطة عقارية - ${c.contractNumber}</title>
@@ -466,7 +463,6 @@ export default function BrokerageContractsPage() {
   const { brokerageContracts, users, currentUser,
     addBrokerageContract, updateBrokerageContract, deleteBrokerageContract } = useStore();
 
-  const [activeTab, setActiveTab] = useState<'list' | 'stats'>('list');
   const [showForm, setShowForm] = useState(false);
   const [formStep, setFormStep] = useState(1);
   const [editing, setEditing] = useState<BrokerageContract | null>(null);

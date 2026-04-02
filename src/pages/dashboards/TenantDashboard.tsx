@@ -2,12 +2,12 @@ import { useState, useRef } from 'react';
 import { useStore, generateId } from '../../data/store';
 import {
   FileText, DollarSign, Wrench, Bell, Calendar, CheckCircle,
-  AlertCircle, Clock, ChevronRight, Plus, Send, MessageCircle,
-  Home, Shield, Phone, Eye, Camera, Star, Upload, X
+  AlertCircle, Plus, Send,
+  Home, Camera, X
 } from 'lucide-react';
 
 export default function TenantDashboard() {
-  const { currentUser, contracts, payments, invoices, maintenanceRequests, appointments, notifications, units, properties, addMaintenanceRequest } = useStore();
+  const { currentUser, contracts, invoices, maintenanceRequests, appointments, notifications, units, properties, addMaintenanceRequest } = useStore();
   const [activeTab, setActiveTab] = useState<'overview' | 'contract' | 'maintenance' | 'appointments'>('overview');
   const [showNewRequest, setShowNewRequest] = useState(false);
   const [requestForm, setRequestForm] = useState({ title: '', category: 'plumbing', priority: 'medium', description: '' });

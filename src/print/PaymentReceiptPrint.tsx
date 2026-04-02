@@ -1,4 +1,4 @@
-import { PrintLayout, PrintSection, PrintGrid, PrintField, PrintTable } from '../components/PrintLayout';
+import { PrintLayout, PrintSection, PrintGrid, PrintField } from '../components/PrintLayout';
 import { useStore } from '../data/store';
 import type { Payment, Installment } from '../types';
 
@@ -9,7 +9,7 @@ interface Props {
 }
 
 export function PaymentReceiptPrint({ payment, installment, onClose }: Props) {
-  const { contracts, invoices, units, properties } = useStore();
+  const { contracts, invoices } = useStore();
   const contract = contracts.find(c => c.id === payment.contractId);
   const invoice = invoices.find(i => i.id === payment.invoiceId);
 

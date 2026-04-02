@@ -2,11 +2,10 @@ import { useState, useMemo } from 'react';
 import { useStore, generateId } from '../../data/store';
 import type { SupportTicket, TicketComment } from '../../types';
 import {
-  Ticket, Plus, Search, Filter, ChevronDown, ChevronUp, Edit, Trash2,
+  Ticket, Plus, Search, Edit, Trash2,
   MessageCircle, CheckCircle, Clock, AlertTriangle, XCircle, ArrowUpCircle,
-  User, Phone, Building2, Send, Star, Printer, RefreshCw, Tag,
-  TrendingUp, BarChart2, AlertCircle, Flag, Eye, EyeOff,
-  MessageSquare, ThumbsUp, Zap, Calendar, Hash, Smartphone
+  User, Phone, Send, Star, Printer, RefreshCw, Tag, AlertCircle,
+  MessageSquare, Zap, Calendar, Smartphone
 } from 'lucide-react';
 
 // ── Ticket Number Generator ────────────────────────────────────
@@ -264,7 +263,7 @@ function TicketDetail({ ticket, onClose, onUpdate }: {
   onClose: () => void;
   onUpdate: (id: string, data: Partial<SupportTicket>) => void;
 }) {
-  const { users, currentUser, customers } = useStore();
+  const { users, currentUser } = useStore();
   const [newComment, setNewComment] = useState('');
   const [isInternal, setIsInternal] = useState(false);
   const [resolution, setResolution] = useState(ticket.resolution ?? '');
@@ -578,7 +577,7 @@ function TicketForm({ editing, onSave, onClose }: {
   onSave: (data: Partial<SupportTicket>) => void;
   onClose: () => void;
 }) {
-  const { customers, properties, units, contracts, users, currentUser } = useStore();
+  const { customers, properties, units, users } = useStore();
   const [form, setForm] = useState({
     customerName: editing?.customerName ?? '',
     customerPhone: editing?.customerPhone ?? '',
@@ -784,7 +783,6 @@ export default function TicketsPage() {
   }, [myTickets, filterStatus, filterCategory, filterPriority, filterAssignee, search, sortBy]);
 
   const kpis = useMemo(() => {
-    const now = Date.now();
     return {
       total: myTickets.length,
       open: myTickets.filter(t => t.status === 'open').length,

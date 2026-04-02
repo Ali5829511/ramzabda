@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { useStore, generateId } from '../../data/store';
+import { useStore } from '../../data/store';
 import {
-  CreditCard, Smartphone, Building2, CheckCircle, Clock, AlertCircle,
-  QrCode, Copy, ExternalLink, Shield, RefreshCw, FileText, DollarSign, Lock
+  CreditCard, Smartphone, CheckCircle, AlertCircle,
+  QrCode, Copy, Shield, RefreshCw, FileText, Lock
 } from 'lucide-react';
 
 const GATEWAYS = [
@@ -20,7 +20,7 @@ const BANK_DETAILS = {
 };
 
 export default function PaymentGatewayPage() {
-  const { invoices, contracts, customers } = useStore();
+  const { invoices } = useStore();
   const [gateway, setGateway] = useState('stc');
   const [selectedInvoice, setSelectedInvoice] = useState('');
   const [cardNumber, setCardNumber] = useState('');

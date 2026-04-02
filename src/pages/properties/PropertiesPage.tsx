@@ -91,7 +91,7 @@ const EMPTY_FORM = {
 type FormType = typeof EMPTY_FORM;
 
 export default function PropertiesPage() {
-  const { properties, units, contracts, invoices, addProperty, updateProperty, deleteProperty, currentUser, users } = useStore();
+  const { properties, units, contracts, addProperty, updateProperty, deleteProperty, currentUser, users } = useStore();
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Property | null>(null);
   const [search, setSearch] = useState('');

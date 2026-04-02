@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useStore } from '../data/store';
 
 export function useLinkedData() {
-  const { properties, units, contracts, invoices, installments, payments } = useStore();
+  const { properties, units, contracts } = useStore();
 
   // Map titleDeedNumber → propertyId
   const deedToPropertyId = useMemo(() => {
@@ -147,7 +147,7 @@ export function useSmartAlerts() {
     });
 
     // Sort: danger first
-    return list.sort((a, b) => (a.type === 'danger' ? -1 : 1));
+    return list.sort((a) => (a.type === 'danger' ? -1 : 1));
   }, [contracts, invoices, installments, maintenanceRequests]);
 
   return alerts;

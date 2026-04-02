@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import {
-  Zap, CheckCircle, Settings, ExternalLink, Lock, Key, AlertCircle,
-  Globe, Smartphone, DollarSign, Users, FileText, Building2,
-  MessageCircle, Mail, BarChart2, Shield, RefreshCw, Eye, EyeOff,
-  Copy, Check, ChevronDown, ChevronUp, Wifi, WifiOff, Plus, X
+  Zap, CheckCircle, Settings, ExternalLink,
+  Globe, DollarSign, Building2,
+  MessageCircle, BarChart2, Shield, Eye, EyeOff, Wifi
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────
@@ -263,7 +262,6 @@ function ConfigModal({ intg, onClose }: { intg: Integration; onClose: () => void
   const [values, setValues] = useState<Record<string, string>>({});
   const [show, setShow] = useState<Record<string, boolean>>({});
   const [saved, setSaved] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   const set = (k: string, v: string) => setValues(p => ({ ...p, [k]: v }));
   const toggle = (k: string) => setShow(p => ({ ...p, [k]: !p[k] }));

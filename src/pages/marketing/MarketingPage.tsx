@@ -2,9 +2,8 @@ import { useState, useMemo } from 'react';
 import { useStore, generateId } from '../../data/store';
 import {
   Megaphone, Plus, Eye, MessageCircle, ExternalLink, Trash2, Edit,
-  TrendingUp, Star, Share2, BarChart2, Calendar, Clock, CheckCircle,
-  MapPin, User, Phone, Building2, DollarSign, Target, Zap,
-  Play, Pause, X, Search, Filter, Copy, Home, Tag
+  TrendingUp, Star, BarChart2, Calendar, Clock, CheckCircle, User, Building2, DollarSign, Target, Zap,
+  Play, Pause, Search, Copy, Home, Tag
 } from 'lucide-react';
 import type { MarketingListing, MarketingCampaign, Appointment } from '../../types';
 
@@ -142,7 +141,7 @@ function ListingCard({
 
 // ─── Appointments Tab ────────────────────────────────────────────────────────
 function AppointmentsTab() {
-  const { appointments, customers, properties, units, users, addAppointment, updateAppointment, currentUser } = useStore();
+  const { appointments, customers, properties, users, addAppointment, updateAppointment, currentUser } = useStore();
   const [showForm, setShowForm] = useState(false);
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterType, setFilterType] = useState('all');
@@ -261,7 +260,6 @@ function AppointmentsTab() {
           ) : sorted.map(a => {
             const cust = customers.find(c => c.id === a.customerId);
             const prop = properties.find(p => p.id === a.propertyId);
-            const unit = (a.unitId) ? a.unitId : null;
             const emp = users.find(u => u.id === a.employeeId);
             const isPast = a.date < today;
             return (
@@ -377,7 +375,7 @@ function AppointmentsTab() {
 
 // ─── Campaigns Tab ────────────────────────────────────────────────────────────
 function CampaignsTab() {
-  const { marketingCampaigns, marketingListings, addMarketingCampaign, updateMarketingCampaign, deleteMarketingCampaign, currentUser } = useStore();
+  const { marketingCampaigns, addMarketingCampaign, updateMarketingCampaign, deleteMarketingCampaign, currentUser } = useStore();
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<MarketingCampaign | null>(null);
 

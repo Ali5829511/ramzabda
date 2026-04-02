@@ -93,12 +93,10 @@ function CustomerProfile({
   onClose: () => void;
   onAddInteraction: (customerId: string) => void;
 }) {
-  const { interactions, users, updateCustomer, appointments, contracts } = useStore();
+  const { interactions, users, contracts } = useStore();
   const customerInteractions = [...interactions.filter(i => i.customerId === customer.id)]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  const customerAppointments = appointments.filter(a => a.customerId === customer.id);
   const assignedUser = users.find(u => u.id === customer.assignedTo);
-  const employees = users.filter(u => u.role === 'employee' || u.role === 'broker');
   const relatedContracts = contracts.filter(c => c.tenantName === customer.name);
 
   return (
@@ -484,7 +482,7 @@ const emptyCustomer = {
 };
 
 export default function CRMPage() {
-  const { customers, interactions, users, appointments, addCustomer, updateCustomer, deleteCustomer,
+  const { customers, interactions, users, addCustomer, updateCustomer, deleteCustomer,
     addInteraction, currentUser } = useStore();
 
   const [activeTab, setActiveTab] = useState<'overview' | 'list' | 'pipeline' | 'interactions' | 'tickets'>('overview');
@@ -493,7 +491,6 @@ export default function CRMPage() {
   const [filterType, setFilterType] = useState('all');
   const [showForm, setShowForm] = useState(false);
   const [showInteractionForm, setShowInteractionForm] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [profileCustomer, setProfileCustomer] = useState<Customer | null>(null);
   const [editing, setEditing] = useState<Customer | null>(null);
   const [form, setForm] = useState(emptyCustomer);
