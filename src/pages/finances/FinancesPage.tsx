@@ -2,6 +2,9 @@ import { useStore } from '../../data/store';
 import { DollarSign, TrendingUp, TrendingDown, BarChart2 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
+const MONTHLY_SEEDS = [0.93, 1.07, 0.85, 1.15, 0.90, 1.10];
+const MONTHLY_LABELS = ['أكتوبر', 'نوفمبر', 'ديسمبر', 'يناير', 'فبراير', 'مارس'];
+
 export default function FinancesPage() {
   const { payments, expenses, contracts, properties, currentUser } = useStore();
 
@@ -19,10 +22,10 @@ export default function FinancesPage() {
   const totalExpenses = myExpenses.reduce((s, e) => s + e.amount, 0);
   const netProfit = totalRevenue - totalExpenses;
 
-  const monthly = ['أكتوبر', 'نوفمبر', 'ديسمبر', 'يناير', 'فبراير', 'مارس'].map((month) => ({
+  const monthly = MONTHLY_LABELS.map((month, i) => ({
     month,
-    إيرادات: (totalRevenue / 6) * (0.8 + Math.random() * 0.4) | 0,
-    مصروفات: (totalExpenses / 6) * (0.7 + Math.random() * 0.6) | 0,
+    إيرادات: (totalRevenue / 6) * MONTHLY_SEEDS[i] | 0,
+    مصروفات: (totalExpenses / 6) * (MONTHLY_SEEDS[5 - i] * 0.9) | 0,
   }));
 
   const expenseByCategory = ['maintenance', 'utilities', 'management', 'marketing', 'other'].map(cat => ({

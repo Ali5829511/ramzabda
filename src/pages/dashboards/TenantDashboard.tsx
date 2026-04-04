@@ -1,5 +1,6 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { useStore, generateId } from '../../data/store';
+import type { MaintenanceRequest } from '../../types';
 import {
   FileText, DollarSign, Wrench, Bell, Calendar, CheckCircle,
   AlertCircle, Plus, Send,
@@ -27,7 +28,11 @@ export default function TenantDashboard() {
   const unit = activeContract ? units.find(u => u.id === activeContract.unitId) : null;
   const property = unit ? properties.find(p => p.id === unit.propertyId) : null;
 
-  const contractDaysLeft = activeContract ? Math.round((new Date(activeContract.contractEndDate || activeContract.endDate || '').getTime() - Date.now()) / 86400000) : 0;
+  const contractEndMs = useMemo(
+    () => activeContract ? new Date(activeContract.contractEndDate || activeContract.endDate || '').getTime() : null,
+    [activeContract]
+  );
+  const contractDaysLeft = contractEndMs !== null ? Math.round((contractEndMs - new Date().getTime()) / 86400000) : 0;
 
   const submitRequest = () => {
     if (!requestForm.title) return;
@@ -35,8 +40,8 @@ export default function TenantDashboard() {
       id: generateId(),
       title: requestForm.title,
       description: requestForm.description,
-      category: requestForm.category as any,
-      priority: requestForm.priority as any,
+      category: requestForm.category as MaintenanceRequest['category'],
+      priority: requestForm.priority as MaintenanceRequest['priority'],
       status: 'new',
       requestSource: 'tenant',
       propertyId: property?.id ?? '',

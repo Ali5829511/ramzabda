@@ -519,7 +519,7 @@ export default function BrokerageContractsPage() {
     exclusive: myContracts.filter(c => c.exclusivity === 'exclusive' && c.status === 'active').length,
     deals: myContracts.filter(c => c.dealStatus === 'deal_done').length,
     expiringSoon: myContracts.filter(c => {
-      const d = Math.ceil((new Date(c.endDate).getTime() - Date.now()) / 86400000);
+      const d = Math.ceil((new Date(c.endDate).getTime() - new Date().getTime()) / 86400000);
       return c.status === 'active' && d > 0 && d <= 14;
     }).length,
     totalCommission: myContracts

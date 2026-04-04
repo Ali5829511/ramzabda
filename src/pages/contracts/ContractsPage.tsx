@@ -138,7 +138,7 @@ export default function ContractsPage() {
     resetForm();
   };
 
-  const getDaysLeft = (endDate: string) => Math.ceil((new Date(endDate).getTime() - Date.now()) / 86400000);
+  const getDaysLeft = (endDate: string) => Math.ceil((new Date(endDate).getTime() - new Date().getTime()) / 86400000);
 
   return (
     <div className="space-y-6">

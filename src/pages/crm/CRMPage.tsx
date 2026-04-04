@@ -518,7 +518,7 @@ export default function CRMPage() {
     negotiating: myCustomers.filter(c => c.status === 'negotiating').length,
     closed: myCustomers.filter(c => c.status === 'closed').length,
     totalInteractions: interactions.length,
-    followUps: myCustomers.filter(c => c.nextFollowUp && new Date(c.nextFollowUp) <= new Date(Date.now() + 86400000 * 3)).length,
+    followUps: myCustomers.filter(c => c.nextFollowUp && new Date(c.nextFollowUp) <= new Date(new Date().getTime() + 86400000 * 3)).length,
   }), [myCustomers, interactions]);
 
   const sourceDistribution = useMemo(() => {
@@ -690,7 +690,7 @@ export default function CRMPage() {
                 <Bell className="w-4 h-4" /> متابعات مستحقة خلال 3 أيام
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {myCustomers.filter(c => c.nextFollowUp && new Date(c.nextFollowUp) <= new Date(Date.now()+86400000*3)).map(c => (
+                {myCustomers.filter(c => c.nextFollowUp && new Date(c.nextFollowUp) <= new Date(new Date().getTime()+86400000*3)).map(c => (
                   <div key={c.id} onClick={() => setProfileCustomer(c)}
                     className="flex items-center gap-3 p-2.5 bg-orange-50 rounded-xl cursor-pointer hover:bg-orange-100">
                     <div className="w-8 h-8 bg-orange-200 rounded-xl flex items-center justify-center text-sm font-bold text-orange-700">{c.name.charAt(0)}</div>

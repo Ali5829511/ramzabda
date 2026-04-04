@@ -149,6 +149,27 @@ const styles: Record<string, React.CSSProperties> = {
   footerCopy: { fontSize: '11px', color: TEXT_MUTED, margin: '4px 0 0' },
 };
 
+const val = (v?: string | number | null) =>
+  v ? <p style={styles.fieldValue}>{v}</p> : <p style={styles.fieldValueEmpty}>—</p>;
+
+function Field({ label, value }: { label: string; value?: string | number | null }) {
+  return (
+    <div style={styles.fieldCard}>
+      <p style={styles.fieldLabel}>{label}</p>
+      {val(value)}
+    </div>
+  );
+}
+
+function SecHeader({ icon, title }: { icon: string; title: string }) {
+  return (
+    <div style={styles.sectionHeader}>
+      <div style={styles.sectionIcon}>{icon}</div>
+      <h3 style={styles.sectionTitle}>{title}</h3>
+    </div>
+  );
+}
+
 export function PropertyPrint({ property: p, onClose }: Props) {
   const { units, contracts, users } = useStore();
 
@@ -169,23 +190,6 @@ export function PropertyPrint({ property: p, onClose }: Props) {
   const reportDate = p.reportDate
     ? new Date(p.reportDate).toLocaleDateString('ar-SA-u-nu-latn', { year: 'numeric', month: 'long', day: 'numeric' })
     : today;
-
-  const val = (v?: string | number | null) =>
-    v ? <p style={styles.fieldValue}>{v}</p> : <p style={styles.fieldValueEmpty}>—</p>;
-
-  const Field = ({ label, value }: { label: string; value?: string | number | null }) => (
-    <div style={styles.fieldCard}>
-      <p style={styles.fieldLabel}>{label}</p>
-      {val(value)}
-    </div>
-  );
-
-  const SecHeader = ({ icon, title }: { icon: string; title: string }) => (
-    <div style={styles.sectionHeader}>
-      <div style={styles.sectionIcon}>{icon}</div>
-      <h3 style={styles.sectionTitle}>{title}</h3>
-    </div>
-  );
 
   return (
     <div style={styles.overlay}>
@@ -284,7 +288,7 @@ export function PropertyPrint({ property: p, onClose }: Props) {
             <Field label="عدد الطوابق" value={p.floors} />
             <Field label="عدد المواقف" value={p.parkingSpots} />
             <Field label="عدد المصاعد" value={p.elevators} />
-            <Field label="الحجلة / نوع المفتاح" value={(p as any).keyType} />
+            <Field label="الحجلة / نوع المفتاح" value={(p as unknown as Record<string, unknown>).keyType as string | undefined} />
             <Field label="المساحة الإجمالية م²" value={p.deedArea ? `${p.deedArea} م²` : undefined} />
           </div>
 

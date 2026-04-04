@@ -237,9 +237,9 @@ function LicenseCard({ lic, onEdit, onDelete, onPrint, canManage }: {
   lic: AdLicense; onEdit: () => void; onDelete: () => void; onPrint: () => void; canManage: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const daysLeft = lic.expiryDate
-    ? Math.ceil((new Date(lic.expiryDate).getTime() - Date.now()) / 86400000)
-    : null;
+  const daysLeft = useMemo(() => lic.expiryDate
+    ? Math.ceil((new Date(lic.expiryDate).getTime() - new Date().getTime()) / 86400000)
+    : null, [lic.expiryDate]);
   const expiringSoon = daysLeft !== null && daysLeft > 0 && daysLeft <= 14;
 
   return (
@@ -442,7 +442,7 @@ const EMPTY: Omit<AdLicense, 'id' | 'licenseNumber' | 'createdAt'> = {
 function LicenseForm({ editing, onSave, onClose }: {
   editing: AdLicense | null; onSave: (data: Omit<AdLicense, 'id' | 'licenseNumber' | 'createdAt'>) => void; onClose: () => void;
 }) {
-  const { users, properties, units } = useStore();
+  const { users } = useStore();
   const brokers = users.filter(u => u.role === 'broker');
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<typeof EMPTY>(editing ? { ...editing } : { ...EMPTY });
@@ -492,13 +492,13 @@ function LicenseForm({ editing, onSave, onClose }: {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="label">نوع الإعلان *</label>
-                  <select className="input-field" value={f.adType} onChange={e => set({ adType: e.target.value as any })}>
+                  <select className="input-field" value={f.adType} onChange={e => set({ adType: e.target.value as AdLicense['adType'] })}>
                     {Object.entries(adTypeLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="label">نوع الاستخدام *</label>
-                  <select className="input-field" value={f.propertyUse} onChange={e => set({ propertyUse: e.target.value as any })}>
+                  <select className="input-field" value={f.propertyUse} onChange={e => set({ propertyUse: e.target.value as AdLicense['propertyUse'] })}>
                     {Object.entries(propertyUseLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                   </select>
                 </div>
@@ -553,7 +553,7 @@ function LicenseForm({ editing, onSave, onClose }: {
                 </div>
                 <div>
                   <label className="label">نوع الهوية</label>
-                  <select className="input-field" value={f.ownerIdentityType} onChange={e => set({ ownerIdentityType: e.target.value as any })}>
+                  <select className="input-field" value={f.ownerIdentityType} onChange={e => set({ ownerIdentityType: e.target.value as AdLicense['ownerIdentityType'] })}>
                     {Object.entries(identityTypeLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                   </select>
                 </div>
@@ -582,7 +582,7 @@ function LicenseForm({ editing, onSave, onClose }: {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="label">حالة الترخيص</label>
-                  <select className="input-field" value={f.status} onChange={e => set({ status: e.target.value as any })}>
+                  <select className="input-field" value={f.status} onChange={e => set({ status: e.target.value as AdLicense['status'] })}>
                     {Object.entries(statusLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                   </select>
                 </div>
@@ -616,7 +616,7 @@ function LicenseForm({ editing, onSave, onClose }: {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="label">نوع المُعلِن</label>
-                  <select className="input-field" value={f.advertiserType} onChange={e => set({ advertiserType: e.target.value as any })}>
+                  <select className="input-field" value={f.advertiserType} onChange={e => set({ advertiserType: e.target.value as AdLicense['advertiserType'] })}>
                     {Object.entries(advertiserTypeLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                   </select>
                 </div>
@@ -657,8 +657,8 @@ function LicenseForm({ editing, onSave, onClose }: {
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {Object.entries(platformLabels).map(([p, l]) => (
-                    <label key={p} className={`flex items-center gap-2 p-3 rounded-xl border-2 cursor-pointer transition-all ${f.platforms.includes(p as any) ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}>
-                      <input type="checkbox" checked={f.platforms.includes(p as any)} onChange={() => togglePlatform(p)} className="w-4 h-4 accent-yellow-500" />
+                    <label key={p} className={`flex items-center gap-2 p-3 rounded-xl border-2 cursor-pointer transition-all ${f.platforms.includes(p as AdLicense['platforms'][number]) ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}>
+                      <input type="checkbox" checked={f.platforms.includes(p as AdLicense['platforms'][number])} onChange={() => togglePlatform(p)} className="w-4 h-4 accent-yellow-500" />
                       <span className="text-sm font-medium">{l}</span>
                     </label>
                   ))}
@@ -672,7 +672,7 @@ function LicenseForm({ editing, onSave, onClose }: {
                 </div>
                 <div>
                   <label className="label">وحدة السعر</label>
-                  <select className="input-field" value={f.priceUnit ?? 'yearly'} onChange={e => set({ priceUnit: e.target.value as any })}>
+                  <select className="input-field" value={f.priceUnit ?? 'yearly'} onChange={e => set({ priceUnit: e.target.value as AdLicense['priceUnit'] })}>
                     <option value="yearly">سنوي</option>
                     <option value="monthly">شهري</option>
                     <option value="total">إجمالي</option>
@@ -755,7 +755,7 @@ function LicenseForm({ editing, onSave, onClose }: {
 
 // ─── Main Page ────────────────────────────────────────────────
 export default function AdLicensesPage() {
-  const { adLicenses, users, currentUser, addAdLicense, updateAdLicense, deleteAdLicense } = useStore();
+  const { adLicenses, currentUser, addAdLicense, updateAdLicense, deleteAdLicense } = useStore();
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<AdLicense | null>(null);
   const [filterStatus, setFilterStatus] = useState('all');
@@ -782,14 +782,13 @@ export default function AdLicensesPage() {
     }), [myLicenses, filterStatus, filterType, search]);
 
   const kpis = useMemo(() => {
-    const now = Date.now();
     return {
       total: myLicenses.length,
       approved: myLicenses.filter(l => l.status === 'approved').length,
       underReview: myLicenses.filter(l => l.status === 'under_review' || l.status === 'submitted').length,
       rejected: myLicenses.filter(l => l.status === 'rejected').length,
       expiringSoon: myLicenses.filter(l => {
-        const d = l.expiryDate ? Math.ceil((new Date(l.expiryDate).getTime() - now) / 86400000) : null;
+        const d = l.expiryDate ? Math.ceil((new Date(l.expiryDate).getTime() - new Date().getTime()) / 86400000) : null;
         return l.status === 'approved' && d !== null && d > 0 && d <= 14;
       }).length,
       totalViews: myLicenses.reduce((s, l) => s + (l.views ?? 0), 0),

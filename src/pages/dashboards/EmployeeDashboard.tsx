@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useStore } from '../../data/store';
 import {
   Users, Calendar, Building2, FileText, Wrench, TrendingUp,
@@ -12,18 +12,19 @@ export default function EmployeeDashboard({ onNavigate }: { onNavigate?: (page: 
   const {
     currentUser, properties, units, contracts, payments, invoices,
     maintenanceRequests, customers, appointments, expenses,
-    supportTickets, interactions
+    supportTickets
   } = useStore();
 
   const [activeTab, setActiveTab] = useState<'overview' | 'tasks' | 'crm' | 'reports'>('overview');
   const [searchTerm, setSearchTerm] = useState('');
 
   const todayStr = new Date().toISOString().split('T')[0];
+  const nowMs = useMemo(() => new Date().getTime(), []);
 
   // Key metrics
   const activeContracts = contracts.filter(c => c.status === 'active');
   const expiringContracts = contracts.filter(c => {
-    const days = Math.round((new Date(c.contractEndDate || c.endDate || '').getTime() - Date.now()) / 86400000);
+    const days = Math.round((new Date(c.contractEndDate || c.endDate || '').getTime() - nowMs) / 86400000);
     return days <= 30 && days > 0 && c.status === 'active';
   });
   const overdueInvoices = invoices.filter(i => i.invoiceStatus === 'overdue');
@@ -46,12 +47,11 @@ export default function EmployeeDashboard({ onNavigate }: { onNavigate?: (page: 
   const occupancyRate = totalUnits > 0 ? Math.round((rentedUnits / totalUnits) * 100) : 0;
 
   // Recent activity
-  const recentInteractions = interactions?.slice(-5).reverse() ?? [];
   const recentMaintenance = maintenanceRequests.slice(-5).reverse();
 
   // Alerts
   const alerts = [
-    ...expiringContracts.map(c => ({ type: 'warning', msg: `عقد ${c.contractNumber} ينتهي خلال ${Math.round((new Date(c.contractEndDate || c.endDate || '').getTime() - Date.now()) / 86400000)} يوم`, link: 'contracts-list' })),
+    ...expiringContracts.map(c => ({ type: 'warning', msg: `عقد ${c.contractNumber} ينتهي خلال ${Math.round((new Date(c.contractEndDate || c.endDate || '').getTime() - nowMs) / 86400000)} يوم`, link: 'contracts-list' })),
     ...overdueInvoices.slice(0, 3).map(i => ({ type: 'danger', msg: `فاتورة متأخرة ${i.invoiceNumber} - ${i.remainingAmount?.toLocaleString('ar-SA')} ر.س`, link: 'payments' })),
     ...urgentMaintenance.slice(0, 2).map(m => ({ type: 'urgent', msg: `بلاغ صيانة عاجل: ${m.title}`, link: 'maintenance' })),
   ];
@@ -275,7 +275,7 @@ export default function EmployeeDashboard({ onNavigate }: { onNavigate?: (page: 
             {expiringContracts.length === 0 ? (
               <p className="text-sm text-gray-400 text-center py-3">لا توجد عقود منتهية قريباً</p>
             ) : expiringContracts.map(c => {
-              const days = Math.round((new Date(c.contractEndDate || c.endDate || '').getTime() - Date.now()) / 86400000);
+              const days = Math.round((new Date(c.contractEndDate || c.endDate || '').getTime() - nowMs) / 86400000);
               return (
                 <div key={c.id} className="flex items-center justify-between p-3 bg-yellow-50 rounded-xl mb-2 last:mb-0">
                   <div>

@@ -20,8 +20,9 @@ export default function ElectronicSignature({ signerName, signerRole = 'tenant',
   const [drawing, setDrawing] = useState(false);
   const [isEmpty, setIsEmpty] = useState(true);
   const [signed, setSigned] = useState(false);
-  const [timestamp] = useState(new Date().toLocaleString('ar-SA'));
-  const [ip] = useState('192.168.1.' + Math.floor(Math.random() * 200 + 10));
+  const [signatureDataUrl, setSignatureDataUrl] = useState('');
+  const [timestamp] = useState(() => new Date().toLocaleString('ar-SA'));
+  const [ip] = useState(() => '192.168.1.' + Math.floor(Math.random() * 200 + 10));
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -34,9 +35,8 @@ export default function ElectronicSignature({ signerName, signerRole = 'tenant',
 
     if (existingSignature) {
       const img = new Image();
-      img.onload = () => ctx.drawImage(img, 0, 0);
+      img.onload = () => { ctx.drawImage(img, 0, 0); setIsEmpty(false); };
       img.src = existingSignature;
-      setIsEmpty(false);
     }
   }, [existingSignature]);
 
@@ -81,6 +81,7 @@ export default function ElectronicSignature({ signerName, signerRole = 'tenant',
     const canvas = canvasRef.current; if (!canvas || isEmpty) return;
     const dataUrl = canvas.toDataURL('image/png');
     setSigned(true);
+    setSignatureDataUrl(dataUrl);
     onSign?.(dataUrl);
   };
 
@@ -116,8 +117,8 @@ export default function ElectronicSignature({ signerName, signerRole = 'tenant',
             <Check className="w-8 h-8 text-green-600" />
           </div>
           <p className="font-bold text-gray-800">تم التوقيع بنجاح</p>
-          {canvasRef.current && (
-            <img src={canvasRef.current.toDataURL()} alt="التوقيع" className="max-h-20 mx-auto border border-gray-200 rounded-xl p-2" />
+          {signatureDataUrl && (
+            <img src={signatureDataUrl} alt="التوقيع" className="max-h-20 mx-auto border border-gray-200 rounded-xl p-2" />
           )}
           <div className="text-xs text-gray-400 space-y-1">
             <p>وقت التوقيع: {timestamp}</p>
