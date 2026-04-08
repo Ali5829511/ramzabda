@@ -4,7 +4,7 @@ import type {
   User, Property, Unit, Contract, Invoice, Installment, Payment,
   MaintenanceRequest, Customer, Interaction, Appointment,
   MarketingListing, MarketingCampaign, Template, Notification,
-  Expense, SupportTicket, BrokerageContract, AdLicense
+  Expense, SupportTicket, BrokerageContract, AdLicense, ArchiveDocument
 } from '../types';
 import * as seedData from './db';
 import {
@@ -35,6 +35,7 @@ export interface AppState {
   supportTickets: SupportTicket[];
   brokerageContracts: BrokerageContract[];
   adLicenses: AdLicense[];
+  archiveDocuments: ArchiveDocument[];
 
   login: (email: string, password: string) => boolean;
   logout: () => void;
@@ -123,6 +124,11 @@ export interface AppState {
   addUser: (u: User) => void;
   updateUser: (id: string, data: Partial<User>) => void;
 
+  // Archive Documents
+  addArchiveDocument: (d: ArchiveDocument) => void;
+  updateArchiveDocument: (id: string, data: Partial<ArchiveDocument>) => void;
+  deleteArchiveDocument: (id: string) => void;
+
   // Reset DB
   resetToSeed: () => void;
 
@@ -157,6 +163,7 @@ export const useStore = create<AppState>()(
       supportTickets: [],
       brokerageContracts: [],
       adLicenses: [],
+      archiveDocuments: [],
 
       login: (email, password) => {
         const user = get().users.find(u => u.email === email && u.password === password && u.isActive);
@@ -237,6 +244,10 @@ export const useStore = create<AppState>()(
         if (updated) syncUpsert('users', updated);
       },
 
+      addArchiveDocument: (d) => { set(s => ({ archiveDocuments: [...s.archiveDocuments, d] })); syncUpsert('archive_documents', d); },
+      updateArchiveDocument: (id, data) => { set(s => ({ archiveDocuments: s.archiveDocuments.map(d => d.id === id ? { ...d, ...data } : d) })); const updated = get().archiveDocuments.find(d => d.id === id); if (updated) syncUpsert('archive_documents', updated); },
+      deleteArchiveDocument: (id) => { set(s => ({ archiveDocuments: s.archiveDocuments.filter(d => d.id !== id) })); syncDelete('archive_documents', id); },
+
       resetToSeed: () => {
         set({
           properties: seedData.properties, units: seedData.units, contracts: seedData.contracts,
@@ -291,6 +302,7 @@ export const useStore = create<AppState>()(
             supportTickets:      snapshot.supportTickets.length      ? snapshot.supportTickets      : get().supportTickets,
             brokerageContracts:  snapshot.brokerageContracts.length  ? snapshot.brokerageContracts  : get().brokerageContracts,
             adLicenses:          snapshot.adLicenses.length          ? snapshot.adLicenses          : get().adLicenses,
+            archiveDocuments:    snapshot.archiveDocuments.length    ? snapshot.archiveDocuments    : get().archiveDocuments,
           });
         }
         set({ isDbLoading: false });
@@ -318,6 +330,7 @@ export const useStore = create<AppState>()(
         supportTickets: state.supportTickets,
         brokerageContracts: state.brokerageContracts,
         adLicenses: state.adLicenses,
+        archiveDocuments: state.archiveDocuments,
         users: state.users,
       }),
     }

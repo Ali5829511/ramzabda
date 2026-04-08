@@ -38,14 +38,15 @@ export type DbTable =
   | 'expenses'
   | 'support_tickets'
   | 'brokerage_contracts'
-  | 'ad_licenses';
+  | 'ad_licenses'
+  | 'archive_documents';
 
 const ALL_TABLES: DbTable[] = [
   'users', 'properties', 'units', 'contracts', 'invoices',
   'installments', 'payments', 'maintenance_requests', 'customers',
   'interactions', 'appointments', 'marketing_listings', 'marketing_campaigns',
   'templates', 'notifications', 'expenses', 'support_tickets',
-  'brokerage_contracts', 'ad_licenses',
+  'brokerage_contracts', 'ad_licenses', 'archive_documents',
 ];
 
 // ─── helpers ──────────────────────────────────────────────────
@@ -73,6 +74,7 @@ export interface SupabaseSnapshot {
   supportTickets: any[];
   brokerageContracts: any[];
   adLicenses: any[];
+  archiveDocuments: any[];
 }
 
 /**
@@ -115,6 +117,7 @@ export async function loadAllFromSupabase(): Promise<SupabaseSnapshot | null> {
       supportTickets:      snapshot['support_tickets'],
       brokerageContracts:  snapshot['brokerage_contracts'],
       adLicenses:          snapshot['ad_licenses'],
+      archiveDocuments:    snapshot['archive_documents'],
     };
   } catch (err) {
     console.error('[supabaseSync] loadAll failed:', err);

@@ -668,3 +668,22 @@ export interface AdLicense {
   createdAt: string;
   updatedAt?: string;
 }
+
+
+// ============================================================
+// ArchiveDocument  (أرشيف الوثائق)
+// ============================================================
+export interface ArchiveDocument {
+  id: string;
+  name: string;
+  type: 'deed' | 'contract' | 'id' | 'permit' | 'invoice' | 'other';
+  propertyId?: string;
+  unitId?: string;
+  contractId?: string;
+  tags: string[];
+  uploadedAt: string;
+  expiresAt?: string;
+  size: string;
+  url?: string;
+  notes?: string;
+}

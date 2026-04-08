@@ -5,21 +5,7 @@ import {
   Trash2, Eye, FolderOpen, Plus, Calendar,
   AlertCircle, Clock,
 } from 'lucide-react';
-
-interface Document {
-  id: string;
-  name: string;
-  type: 'deed' | 'contract' | 'id' | 'permit' | 'invoice' | 'other';
-  propertyId?: string;
-  unitId?: string;
-  contractId?: string;
-  tags: string[];
-  uploadedAt: string;
-  expiresAt?: string;
-  size: string;
-  url?: string;
-  notes?: string;
-}
+import type { ArchiveDocument } from '../../types';
 
 const TYPE_CONFIG = {
   deed:     { label: 'صك ملكية',       icon: '📜', color: 'bg-yellow-100 text-yellow-700' },
@@ -30,7 +16,7 @@ const TYPE_CONFIG = {
   other:    { label: 'مستند آخر',       icon: '📁', color: 'bg-gray-100 text-gray-700' },
 };
 
-const SEED_DOCS: Document[] = [
+const SEED_DOCS: ArchiveDocument[] = [
   { id: 'd1', name: 'صك ملكية - برج النرجس', type: 'deed', tags: ['ملكية', 'الرياض'], uploadedAt: '2024-01-15', size: '2.4 MB' },
   { id: 'd2', name: 'عقد إيجار - أحمد الشمري', type: 'contract', tags: ['عقد', 'مستأجر'], uploadedAt: '2024-03-01', expiresAt: '2025-03-01', size: '1.1 MB' },
   { id: 'd3', name: 'هوية مالك - محمد العتيبي', type: 'id', tags: ['هوية', 'مالك'], uploadedAt: '2024-02-10', expiresAt: '2028-02-10', size: '0.5 MB' },
@@ -40,8 +26,8 @@ const SEED_DOCS: Document[] = [
 ];
 
 export default function DocumentArchivePage() {
-  const { properties, contracts } = useStore();
-  const [docs, setDocs] = useState<Document[]>(SEED_DOCS);
+  const { properties, contracts, archiveDocuments, addArchiveDocument, deleteArchiveDocument } = useStore();
+  const docs = archiveDocuments.length > 0 ? archiveDocuments : SEED_DOCS;
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState('');
   const [filterExpiry, setFilterExpiry] = useState('');
@@ -69,17 +55,17 @@ export default function DocumentArchivePage() {
 
   const addDoc = () => {
     if (!form.name) return;
-    setDocs(prev => [...prev, {
+    addArchiveDocument({
       id: generateId(), ...form,
-      type: form.type as Document['type'],
+      type: form.type as ArchiveDocument['type'],
       tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
       uploadedAt: today, size: '—'
-    }]);
+    });
     setForm({ name: '', type: 'other', propertyId: '', contractId: '', expiresAt: '', notes: '', tags: '' });
     setShowAdd(false);
   };
 
-  const deleteDoc = (id: string) => setDocs(prev => prev.filter(d => d.id !== id));
+  const deleteDoc = (id: string) => deleteArchiveDocument(id);
 
   return (
     <div className="space-y-5" dir="rtl">

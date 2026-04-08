@@ -197,6 +197,16 @@ CREATE TABLE IF NOT EXISTS ad_licenses (
 );
 
 -- ─────────────────────────────────────────────
+-- Archive Documents  (أرشيف الوثائق)
+-- ─────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS archive_documents (
+  id          TEXT PRIMARY KEY,
+  data        JSONB NOT NULL,
+  created_at  TIMESTAMPTZ DEFAULT NOW(),
+  updated_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ─────────────────────────────────────────────
 -- Auto-update updated_at trigger
 -- ─────────────────────────────────────────────
 CREATE OR REPLACE FUNCTION update_updated_at()
@@ -216,7 +226,7 @@ BEGIN
     'installments','payments','maintenance_requests','customers',
     'interactions','appointments','marketing_listings','marketing_campaigns',
     'templates','notifications','expenses','support_tickets',
-    'brokerage_contracts','ad_licenses'
+    'brokerage_contracts','ad_licenses','archive_documents'
   ]
   LOOP
     EXECUTE format(
