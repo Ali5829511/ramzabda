@@ -2,6 +2,7 @@ import express from 'express';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { existsSync } from 'fs';
+import rateLimit from 'express-rate-limit';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -10,6 +11,14 @@ const port = process.env.PORT || 3000;
 const verifyToken = process.env.WHATSAPP_VERIFY_TOKEN || 'RAMZABDAE_VERIFY_2026';
 
 app.use(express.json());
+
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use(generalLimiter);
 
 app.get('/api/health', (_req, res) => {
   res.status(200).json({ ok: true, service: 'ramzabda' });
