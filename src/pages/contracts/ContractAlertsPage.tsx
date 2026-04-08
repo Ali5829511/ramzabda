@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useStore } from '../../data/store';
 import { useSmartAlerts } from '../../hooks/useLinkedData';
-import { FileText, AlertCircle, AlertTriangle, CheckCircle, Clock, Calendar, TrendingDown, Filter } from 'lucide-react';
+import {  AlertCircle, AlertTriangle, CheckCircle, Clock, Calendar } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 type Range = 'all' | 'expired' | '30' | '60' | '90' | 'active';
@@ -10,21 +10,19 @@ export default function ContractAlertsPage() {
   const { contracts, invoices } = useStore();
   const alerts = useSmartAlerts();
   const [range, setRange] = useState<Range>('all');
-  const today = new Date();
-
-  const contractsWithDays = useMemo(() =>
-    contracts.map(c => {
+  const contractsWithDays = useMemo(() => {
+    const now = new Date();
+    return contracts.map(c => {
       const days = c.contractEndDate
-        ? Math.ceil((new Date(c.contractEndDate).getTime() - today.getTime()) / 86400000)
+        ? Math.ceil((new Date(c.contractEndDate).getTime() - now.getTime()) / 86400000)
         : null;
       const cInvoices = invoices.filter(i => i.contractId === c.id);
       const totalPaid = cInvoices.reduce((s, i) => s + i.paidAmount, 0);
       const totalAmount = cInvoices.reduce((s, i) => s + i.totalAmount, 0);
       const pct = totalAmount > 0 ? Math.round((totalPaid / totalAmount) * 100) : 0;
       return { ...c, daysLeft: days, paidPct: pct, totalAmount, totalPaid };
-    }),
-    [contracts, invoices]
-  );
+    });
+  }, [contracts, invoices]);
 
   const filtered = useMemo(() => {
     const list = contractsWithDays.filter(c => c.status === 'active' || range === 'all' || range === 'expired');

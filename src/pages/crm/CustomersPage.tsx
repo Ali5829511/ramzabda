@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useStore, generateId } from '../../data/store';
-import { Plus, User, Phone, Edit, Trash2, MessageCircle } from 'lucide-react';
+import { Plus, Phone, Edit, Trash2, MessageCircle } from 'lucide-react';
 import type { Customer } from '../../types';
 
 const statusLabels: Record<string, string> = { new: 'جديد', contacted: 'تم التواصل', interested: 'مهتم', negotiating: 'تفاوض', closed: 'مكتمل', lost: 'مفقود' };
@@ -9,7 +9,7 @@ const typeLabels: Record<string, string> = { owner: 'مالك', tenant: 'مست�
 const sourceLabels: Record<string, string> = { website: 'الموقع', whatsapp: 'واتساب', referral: 'توصية', social: 'سوشيال', walk_in: 'زيارة', other: 'أخرى' };
 
 export default function CustomersPage() {
-  const { customers, users, addCustomer, updateCustomer, deleteCustomer, addInteraction, currentUser } = useStore();
+  const { customers, users, addCustomer, updateCustomer, deleteCustomer, currentUser } = useStore();
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Customer | null>(null);
   const [search, setSearch] = useState('');

@@ -1,10 +1,6 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import {
-  FileText, MessageCircle, Smartphone, Mail, Copy, Check,
-  Download, Printer, Search, Plus, Star, Tag, Send,
-  Home, Users, Wrench, DollarSign, Calendar, AlertTriangle,
-  FileCheck, Shield, Building2, Key, ClipboardList, ChevronDown,
-  ChevronUp, Eye, Edit3, CheckCircle, XCircle, X, Zap
+  FileText, MessageCircle, Smartphone, Copy, Check, Printer, Search, Tag, Send, ClipboardList, Eye, Edit3
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────
@@ -521,7 +517,7 @@ export default function TemplatesPage() {
           { id: 'sms', label: 'رسائل SMS', icon: <Smartphone className="w-4 h-4" />, count: SMS_TEMPLATES.length, color: 'bg-blue-500' },
           { id: 'forms', label: 'النماذج العقارية', icon: <ClipboardList className="w-4 h-4" />, count: FORMS.length, color: 'bg-purple-500' },
         ].map(t => (
-          <button key={t.id} onClick={() => { setTab(t.id as any); setCatFilter('all'); setSearch(''); }}
+          <button key={t.id} onClick={() => { setTab(t.id as 'whatsapp' | 'sms' | 'forms'); setCatFilter('all'); setSearch(''); }}
             className={`flex items-center gap-2 px-4 py-2 rounded-t-xl text-sm font-semibold transition-colors ${tab === t.id ? `${t.color} text-white shadow` : 'text-gray-600 hover:bg-gray-100'}`}>
             {t.icon}{t.label}
             <span className={`text-xs px-1.5 py-0.5 rounded-full ${tab === t.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'}`}>{t.count}</span>

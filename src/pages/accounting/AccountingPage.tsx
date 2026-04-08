@@ -1,12 +1,12 @@
 import { useState, useMemo } from 'react';
 import { useStore } from '../../data/store';
 import {
-  DollarSign, TrendingUp, TrendingDown, CheckCircle, Clock, AlertCircle,
-  FileText, CreditCard, BarChart2, Download, Filter, Search, ChevronDown, ChevronUp
+  DollarSign, TrendingUp, CheckCircle, Clock, AlertCircle,
+  FileText, CreditCard, BarChart2, Download, Search, ChevronDown, ChevronUp
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, LineChart, Line, Legend
+  PieChart, Pie, Cell
 } from 'recharts';
 
 const COLORS = ['#F59E0B', '#10B981', '#3B82F6', '#EF4444', '#8B5CF6'];
@@ -34,7 +34,7 @@ function StatCard({ label, value, sub, color, icon }: { label: string; value: st
 }
 
 export default function AccountingPage() {
-  const { invoices, installments, payments, contracts, properties, expenses, currentUser } = useStore();
+  const { invoices, installments, payments, contracts, expenses, currentUser } = useStore();
   const [tab, setTab] = useState<Tab>('overview');
   const [invFilter, setInvFilter] = useState('all');
   const [search, setSearch] = useState('');

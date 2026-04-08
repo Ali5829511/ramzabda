@@ -6,12 +6,6 @@
         "repo": ".",
         "rootDirectory": "backend"
       }
-    },
-    "frontend": {
-      "source": {
-        "repo": ".",
-        "rootDirectory": "frontend"
-      }
     }
   }
 }

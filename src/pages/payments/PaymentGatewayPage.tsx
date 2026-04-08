@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { useStore, generateId } from '../../data/store';
+import { useStore } from '../../data/store';
 import {
-  CreditCard, Smartphone, Building2, CheckCircle, Clock, AlertCircle,
-  QrCode, Copy, ExternalLink, Shield, RefreshCw, FileText, DollarSign, Lock
+  CreditCard, Smartphone, CheckCircle, AlertCircle,
+  QrCode, Copy, Shield, RefreshCw, FileText, Lock
 } from 'lucide-react';
 
 const GATEWAYS = [
@@ -20,7 +20,7 @@ const BANK_DETAILS = {
 };
 
 export default function PaymentGatewayPage() {
-  const { invoices, contracts, customers } = useStore();
+  const { invoices } = useStore();
   const [gateway, setGateway] = useState('stc');
   const [selectedInvoice, setSelectedInvoice] = useState('');
   const [cardNumber, setCardNumber] = useState('');
@@ -30,6 +30,7 @@ export default function PaymentGatewayPage() {
   const [phone, setPhone] = useState('');
   const [processing, setProcessing] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [refId, setRefId] = useState('');
   const [copiedField, setCopiedField] = useState('');
 
   const pendingInvoices = invoices.filter(i => i.invoiceStatus === 'pending' || i.invoiceStatus === 'overdue');
@@ -43,6 +44,7 @@ export default function PaymentGatewayPage() {
     await new Promise(r => setTimeout(r, 2000));
     setProcessing(false);
     setSuccess(true);
+    setRefId(Date.now().toString().slice(-8));
     setTimeout(() => setSuccess(false), 4000);
   };
 
@@ -61,7 +63,7 @@ export default function PaymentGatewayPage() {
           </div>
           <h2 className="text-2xl font-black text-gray-800">تمت عملية الدفع بنجاح!</h2>
           <p className="text-gray-500">تم تسجيل الدفعة وإرسال الإيصال</p>
-          <p className="text-sm text-gray-400">رقم المرجع: PAY-{Date.now().toString().slice(-8)}</p>
+          <p className="text-sm text-gray-400">رقم المرجع: PAY-{refId}</p>
           <button onClick={() => setSuccess(false)} className="btn-primary mt-4">العودة</button>
         </div>
       </div>

@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import {
-  Zap, CheckCircle, Settings, ExternalLink, Lock, Key, AlertCircle,
-  Globe, Smartphone, DollarSign, Users, FileText, Building2,
-  MessageCircle, Mail, BarChart2, Shield, RefreshCw, Eye, EyeOff,
-  Copy, Check, ChevronDown, ChevronUp, Wifi, WifiOff, Plus, X
+  Zap, CheckCircle, Settings, ExternalLink,
+  Globe, DollarSign, Building2,
+  MessageCircle, BarChart2, Shield, Eye, EyeOff, Wifi
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────
@@ -263,7 +262,6 @@ function ConfigModal({ intg, onClose }: { intg: Integration; onClose: () => void
   const [values, setValues] = useState<Record<string, string>>({});
   const [show, setShow] = useState<Record<string, boolean>>({});
   const [saved, setSaved] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   const set = (k: string, v: string) => setValues(p => ({ ...p, [k]: v }));
   const toggle = (k: string) => setShow(p => ({ ...p, [k]: !p[k] }));
@@ -315,7 +313,7 @@ function ConfigModal({ intg, onClose }: { intg: Integration; onClose: () => void
                   {f.type === 'select' ? (
                     <select className="input-field text-sm" value={values[f.key] ?? ''} onChange={e => set(f.key, e.target.value)}>
                       <option value="">— اختر —</option>
-                      {(f as any).options?.map((o: string) => <option key={o} value={o}>{o}</option>)}
+                      {(f as { options?: string[] }).options?.map((o: string) => <option key={o} value={o}>{o}</option>)}
                     </select>
                   ) : (
                     <div className="relative">

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useStore, generateId } from '../../data/store';
-import { Plus, Calendar, Clock, MapPin, Edit, CheckCircle } from 'lucide-react';
+import { Plus, Calendar, Clock, MapPin, CheckCircle } from 'lucide-react';
 import type { Appointment } from '../../types';
 
 const typeLabels: Record<string, string> = { viewing: 'زيارة عقار', handover: 'تسليم/استلام', maintenance: 'صيانة', contract: 'توقيع عقد', other: 'أخرى' };
@@ -8,7 +8,7 @@ const statusLabels: Record<string, string> = { scheduled: 'مجدول', confirme
 const statusColors: Record<string, string> = { scheduled: 'badge-yellow', confirmed: 'badge-blue', completed: 'badge-green', cancelled: 'badge-gray', no_show: 'badge-red' };
 
 export default function AppointmentsPage() {
-  const { appointments, customers, properties, units, users, addAppointment, updateAppointment, currentUser } = useStore();
+  const { appointments, customers, properties, users, addAppointment, updateAppointment, currentUser } = useStore();
   const [showForm, setShowForm] = useState(false);
   const [filterStatus, setFilterStatus] = useState('all');
 

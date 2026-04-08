@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { useStore, generateId } from '../data/store';
+import { useStore } from '../data/store';
+import type { Contract, Invoice, MaintenanceRequest, Appointment } from '../types';
 import {
   Bell, X, CheckCheck, AlertCircle, AlertTriangle, Info,
-  FileText, Wrench, DollarSign, Calendar, Users, Filter,
-  Trash2, RefreshCw, CheckCircle, Clock, Volume2, VolumeX
+  FileText, Wrench, DollarSign, Calendar,
+  Trash2, CheckCircle, Volume2, VolumeX
 } from 'lucide-react';
 
 type AlertCategory = 'all' | 'contract' | 'invoice' | 'maintenance' | 'appointment' | 'system';
@@ -20,7 +21,7 @@ interface SmartAlert {
 }
 
 function buildSmartAlerts(
-  contracts: any[], invoices: any[], maintenanceRequests: any[], appointments: any[]
+  contracts: Contract[], invoices: Invoice[], maintenanceRequests: MaintenanceRequest[], appointments: Appointment[]
 ): SmartAlert[] {
   const alerts: SmartAlert[] = [];
   const today = new Date();
@@ -28,7 +29,9 @@ function buildSmartAlerts(
 
   // Expiring contracts
   contracts.filter(c => c.status === 'active').forEach(c => {
-    const end = new Date(c.endDate);
+    const endDateStr = c.endDate ?? c.contractEndDate;
+    if (!endDateStr) return;
+    const end = new Date(endDateStr);
     const days = Math.round((end.getTime() - today.getTime()) / 86400000);
     if (days < 0) {
       alerts.push({ id: `ce-${c.id}`, type: 'danger', category: 'contract', isRead: false,
@@ -91,7 +94,7 @@ interface Props {
 }
 
 export default function NotificationCenter({ onNavigate }: Props) {
-  const { contracts, invoices, maintenanceRequests, appointments, notifications, markNotificationRead, addNotification } = useStore();
+  const { contracts, invoices, maintenanceRequests, appointments } = useStore();
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState<AlertCategory>('all');
   const [soundEnabled, setSoundEnabled] = useState(true);

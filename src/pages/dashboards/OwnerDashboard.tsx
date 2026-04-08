@@ -1,14 +1,13 @@
 import { useState, useMemo } from 'react';
 import { useStore } from '../../data/store';
 import {
-  Building2, Home, FileText, DollarSign, TrendingUp, TrendingDown,
-  AlertCircle, CheckCircle, Clock, Calendar, Wrench, BarChart2,
-  PieChart as PieIcon, Bell, Phone, Download, Printer, Eye, ChevronRight,
-  ArrowUpRight, ArrowDownRight, Star, MapPin, Shield
+   Home, DollarSign, TrendingUp, TrendingDown,
+  AlertCircle, CheckCircle, Clock, Wrench, BarChart2,
+  PieChart as PieIcon, Printer, MapPin
 } from 'lucide-react';
 import {
-  AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip,
-  ResponsiveContainer, PieChart, Pie, Cell, Legend
+  AreaChart, Area, XAxis, YAxis, Tooltip,
+  ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
 
 const COLORS = ['#F59E0B', '#10B981', '#3B82F6', '#EF4444', '#8B5CF6'];

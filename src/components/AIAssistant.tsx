@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useStore } from '../data/store';
 import type { AppState } from '../data/store';
-import { Bot, X, Send, Minimize2, Maximize2, Sparkles, RefreshCw } from 'lucide-react';
+import { Bot, X, Send, Minimize2, Maximize2, Sparkles } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -195,7 +195,17 @@ export default function AIAssistant() {
           <div className="px-3 pb-2">
             <div className="flex gap-1.5 flex-wrap">
               {SUGGESTIONS.map(s => (
-                <button key={s} onClick={() => { setInput(s); }}
+                <button key={s} onClick={() => {
+                  setInput('');
+                  setMessages(prev => [...prev, { id: Date.now().toString(), role: 'user', text: s, time: getTime() }]);
+                  setTyping(true);
+                  setTimeout(async () => {
+                    const ctx = buildContext(store);
+                    const reply = generateReply(s, ctx);
+                    setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'assistant', text: reply, time: getTime() }]);
+                    setTyping(false);
+                  }, 800);
+                }}
                   className="text-xs bg-yellow-50 text-yellow-700 border border-yellow-200 px-2 py-1 rounded-full hover:bg-yellow-100 transition-colors">
                   {s}
                 </button>

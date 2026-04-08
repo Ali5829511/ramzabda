@@ -1,11 +1,9 @@
 import { useState, useMemo } from 'react';
 import { useStore, generateId } from '../../data/store';
 import {
-  FileText, Plus, Edit, Trash2, Printer, Eye, CheckCircle,
-  Clock, XCircle, AlertTriangle, Search, User, Building2,
-  Phone, Mail, CreditCard, Shield, Star, DollarSign,
-  Calendar, Hash, MapPin, Award, ChevronDown, ChevronUp,
-  Copy, ExternalLink, TrendingUp, BarChart2, RefreshCw
+  FileText, Plus, Edit, Trash2, Printer, CheckCircle,
+  Clock, AlertTriangle, Search, User, Building2, Shield, Star, DollarSign,
+  Calendar, Hash, MapPin, Award, ChevronDown, ChevronUp, TrendingUp
 } from 'lucide-react';
 import type { BrokerageContract } from '../../types';
 import { ContractAnalyzerWidget, type ExtractedContractData } from '../../components/ContractAnalyzerWidget';
@@ -67,7 +65,6 @@ function KpiCard({ label, value, icon, color, sub }: {
 function printContract(c: BrokerageContract) {
   const win = window.open('', '_blank');
   if (!win) return;
-  const daysLeft = Math.ceil((new Date(c.endDate).getTime() - Date.now()) / 86400000);
   win.document.write(`<!DOCTYPE html><html dir="rtl" lang="ar"><head>
     <meta charset="UTF-8">
     <title>عقد وساطة عقارية - ${c.contractNumber}</title>
@@ -406,7 +403,7 @@ function ContractCard({ c, onEdit, onDelete, onPrint, currentUserRole }: {
                 { key: 'canKeyHandover', label: 'تسليم المفاتيح', icon: '🔑' },
               ].map(({ key, label, icon }) => (
                 <span key={key}
-                  className={`text-xs px-3 py-1.5 rounded-full font-medium ${(c as any)[key] ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400 line-through'}`}>
+                  className={`text-xs px-3 py-1.5 rounded-full font-medium ${(c as unknown as Record<string, unknown>)[key] ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400 line-through'}`}>
                   {icon} {label}
                 </span>
               ))}
@@ -466,7 +463,6 @@ export default function BrokerageContractsPage() {
   const { brokerageContracts, users, currentUser,
     addBrokerageContract, updateBrokerageContract, deleteBrokerageContract } = useStore();
 
-  const [activeTab, setActiveTab] = useState<'list' | 'stats'>('list');
   const [showForm, setShowForm] = useState(false);
   const [formStep, setFormStep] = useState(1);
   const [editing, setEditing] = useState<BrokerageContract | null>(null);
@@ -523,7 +519,7 @@ export default function BrokerageContractsPage() {
     exclusive: myContracts.filter(c => c.exclusivity === 'exclusive' && c.status === 'active').length,
     deals: myContracts.filter(c => c.dealStatus === 'deal_done').length,
     expiringSoon: myContracts.filter(c => {
-      const d = Math.ceil((new Date(c.endDate).getTime() - Date.now()) / 86400000);
+      const d = Math.ceil((new Date(c.endDate).getTime() - new Date().getTime()) / 86400000);
       return c.status === 'active' && d > 0 && d <= 14;
     }).length,
     totalCommission: myContracts
@@ -677,7 +673,7 @@ export default function BrokerageContractsPage() {
                     </div>
                     <div>
                       <label className="label">نوع الهوية</label>
-                      <select className="input-field" value={form.ownerIdentityType} onChange={e => setForm({ ...form, ownerIdentityType: e.target.value as any })}>
+                      <select className="input-field" value={form.ownerIdentityType} onChange={e => setForm({ ...form, ownerIdentityType: e.target.value as BrokerageContract['ownerIdentityType'] })}>
                         {Object.entries(identityTypeLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                       </select>
                     </div>
@@ -783,13 +779,13 @@ export default function BrokerageContractsPage() {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="label">نوع العقد *</label>
-                      <select className="input-field" value={form.contractType} onChange={e => setForm({ ...form, contractType: e.target.value as any })}>
+                      <select className="input-field" value={form.contractType} onChange={e => setForm({ ...form, contractType: e.target.value as BrokerageContract['contractType'] })}>
                         {Object.entries(contractTypeLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                       </select>
                     </div>
                     <div>
                       <label className="label">نوع التفويض</label>
-                      <select className="input-field" value={form.exclusivity} onChange={e => setForm({ ...form, exclusivity: e.target.value as any })}>
+                      <select className="input-field" value={form.exclusivity} onChange={e => setForm({ ...form, exclusivity: e.target.value as BrokerageContract['exclusivity'] })}>
                         <option value="exclusive">حصري</option>
                         <option value="non_exclusive">غير حصري</option>
                       </select>
@@ -812,7 +808,7 @@ export default function BrokerageContractsPage() {
                     </div>
                     <div>
                       <label className="label">العمولة على</label>
-                      <select className="input-field" value={form.commissionPayer} onChange={e => setForm({ ...form, commissionPayer: e.target.value as any })}>
+                      <select className="input-field" value={form.commissionPayer} onChange={e => setForm({ ...form, commissionPayer: e.target.value as BrokerageContract['commissionPayer'] })}>
                         {Object.entries(commissionPayerLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                       </select>
                     </div>
@@ -844,8 +840,8 @@ export default function BrokerageContractsPage() {
                         { key: 'canReceivePayments', label: '💰 استلام المدفوعات' },
                         { key: 'canKeyHandover', label: '🔑 تسليم المفاتيح' },
                       ].map(({ key, label }) => (
-                        <label key={key} className={`flex items-center gap-2 p-3 rounded-xl border-2 cursor-pointer transition-all ${(form as any)[key] ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}>
-                          <input type="checkbox" checked={(form as any)[key]} onChange={e => setForm({ ...form, [key]: e.target.checked })} className="w-4 h-4 accent-yellow-500" />
+                        <label key={key} className={`flex items-center gap-2 p-3 rounded-xl border-2 cursor-pointer transition-all ${(form as unknown as Record<string, unknown>)[key] ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}>
+                          <input type="checkbox" checked={!!(form as unknown as Record<string, unknown>)[key]} onChange={e => setForm({ ...form, [key]: e.target.checked })} className="w-4 h-4 accent-yellow-500" />
                           <span className="text-sm font-medium">{label}</span>
                         </label>
                       ))}
@@ -861,7 +857,7 @@ export default function BrokerageContractsPage() {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="label">حالة العقد</label>
-                      <select className="input-field" value={form.status} onChange={e => setForm({ ...form, status: e.target.value as any })}>
+                      <select className="input-field" value={form.status} onChange={e => setForm({ ...form, status: e.target.value as BrokerageContract['status'] })}>
                         {Object.entries(statusLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                       </select>
                     </div>
@@ -884,7 +880,7 @@ export default function BrokerageContractsPage() {
 
                     <div className="col-span-2 border-t pt-3">
                       <label className="label mb-2 flex items-center gap-1"><TrendingUp className="w-3.5 h-3.5 text-green-500" /> حالة الصفقة (بعد الاتفاق)</label>
-                      <select className="input-field" value={form.dealStatus ?? 'pending'} onChange={e => setForm({ ...form, dealStatus: e.target.value as any })}>
+                      <select className="input-field" value={form.dealStatus ?? 'pending'} onChange={e => setForm({ ...form, dealStatus: e.target.value as BrokerageContract['dealStatus'] })}>
                         {Object.entries(dealStatusLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                       </select>
                     </div>

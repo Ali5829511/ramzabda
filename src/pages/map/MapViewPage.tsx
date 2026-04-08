@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useStore } from '../../data/store';
 import {
-  MapPin, Building2, Home, Search, Filter, ExternalLink,
-  CheckCircle, Clock, Wrench, AlertCircle, Info, Navigation
+  MapPin, Building2, Home, Search, ExternalLink,
+  CheckCircle, AlertCircle, Navigation
 } from 'lucide-react';
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; dot: string }> = {

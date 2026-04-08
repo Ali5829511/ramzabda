@@ -2,19 +2,19 @@ import { useState, useMemo } from 'react';
 import { useStore } from '../../data/store';
 import {
   Target, TrendingUp, TrendingDown, BarChart2, Building2,
-  DollarSign, Calendar, Home, Printer, Download, Filter
+  DollarSign, Home, Printer
 } from 'lucide-react';
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+   XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, LineChart, Line
 } from 'recharts';
 
 const COLORS = ['#F59E0B', '#10B981', '#3B82F6', '#EF4444', '#8B5CF6'];
+const MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 
 export default function ROIReportsPage() {
   const { properties, units, contracts, invoices, expenses, payments } = useStore();
   const [period, setPeriod] = useState<'month' | 'quarter' | 'year'>('year');
-  const [selectedProp, setSelectedProp] = useState('');
 
   const propertyROI = useMemo(() => {
     return properties.map(p => {
@@ -47,19 +47,18 @@ export default function ROIReportsPage() {
   const avgOcc = propertyROI.length ? Math.round(propertyROI.reduce((s, p) => s + p.occupancy, 0) / propertyROI.length) : 0;
 
   // Monthly trend
-  const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
   const monthlyTrend = useMemo(() => {
     const map: Record<number, { month: string; إيرادات: number; مصروفات: number; صافي: number }> = {};
     payments.forEach(p => {
       if (!p.paymentDate) return;
       const m = new Date(p.paymentDate).getMonth();
-      if (!map[m]) map[m] = { month: months[m], إيرادات: 0, مصروفات: 0, صافي: 0 };
+      if (!map[m]) map[m] = { month: MONTHS[m], إيرادات: 0, مصروفات: 0, صافي: 0 };
       map[m].إيرادات += p.amount || 0;
     });
     expenses.forEach(e => {
       if (!e.date) return;
       const m = new Date(e.date).getMonth();
-      if (!map[m]) map[m] = { month: months[m], إيرادات: 0, مصروفات: 0, صافي: 0 };
+      if (!map[m]) map[m] = { month: MONTHS[m], إيرادات: 0, مصروفات: 0, صافي: 0 };
       map[m].مصروفات += e.amount || 0;
     });
     return Object.entries(map).sort(([a], [b]) => parseInt(a) - parseInt(b))

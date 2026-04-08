@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useStore, generateId } from '../../data/store';
-import { Plus, DollarSign, CheckCircle, Clock, AlertCircle, ChevronRight, ChevronDown, CreditCard } from 'lucide-react';
+import {  CheckCircle, Clock, AlertCircle, ChevronRight, ChevronDown, CreditCard } from 'lucide-react';
 import type { Payment } from '../../types';
 
 const invoiceStatusLabels: Record<string, string> = { pending: 'معلقة', paid: 'مدفوعة', overdue: 'متأخرة', partial: 'جزئي', cancelled: 'ملغاة' };
