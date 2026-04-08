@@ -1,12 +1,20 @@
-import { useStore } from '../../data/store';
-import { DollarSign, TrendingUp, TrendingDown, BarChart2 } from 'lucide-react';
+import { useState } from 'react';
+import { useStore, generateId } from '../../data/store';
+import { DollarSign, TrendingUp, TrendingDown, BarChart2, Plus, Trash2, X } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import type { Expense } from '../../types';
 
 const MONTHLY_SEEDS = [0.93, 1.07, 0.85, 1.15, 0.90, 1.10];
 const MONTHLY_LABELS = ['أكتوبر', 'نوفمبر', 'ديسمبر', 'يناير', 'فبراير', 'مارس'];
 
+const categoryLabels: Record<string, string> = {
+  maintenance: 'صيانة', utilities: 'خدمات', management: 'إدارة', marketing: 'تسويق', other: 'أخرى'
+};
+
 export default function FinancesPage() {
-  const { payments, expenses, contracts, properties, currentUser } = useStore();
+  const { payments, expenses, contracts, properties, currentUser, addExpense, deleteExpense } = useStore();
+  const [showExpenseForm, setShowExpenseForm] = useState(false);
+  const [form, setForm] = useState({ description: '', amount: '', category: 'maintenance', date: new Date().toISOString().slice(0, 10), propertyId: '' });
 
   const myProperties = currentUser?.role === 'owner'
     ? properties.filter(p => p.ownerId === currentUser.id)
@@ -28,17 +36,91 @@ export default function FinancesPage() {
     مصروفات: (totalExpenses / 6) * (MONTHLY_SEEDS[5 - i] * 0.9) | 0,
   }));
 
-  const expenseByCategory = ['maintenance', 'utilities', 'management', 'marketing', 'other'].map(cat => ({
-    name: { maintenance: 'صيانة', utilities: 'خدمات', management: 'إدارة', marketing: 'تسويق', other: 'أخرى' }[cat],
+  const expenseByCategory = Object.keys(categoryLabels).map(cat => ({
+    name: categoryLabels[cat],
     value: myExpenses.filter(e => e.category === cat).reduce((s, e) => s + e.amount, 0)
   })).filter(c => c.value > 0);
 
+  const handleAddExpense = (e: React.FormEvent) => {
+    e.preventDefault();
+    const amt = parseFloat(form.amount);
+    if (!amt || amt <= 0) return;
+    addExpense({
+      id: generateId(),
+      description: form.description,
+      amount: amt,
+      category: form.category as Expense['category'],
+      date: form.date,
+      propertyId: form.propertyId || undefined,
+      paidBy: currentUser?.id ?? 'admin',
+      createdAt: new Date().toISOString(),
+    });
+    setForm({ description: '', amount: '', category: 'maintenance', date: new Date().toISOString().slice(0, 10), propertyId: '' });
+    setShowExpenseForm(false);
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="section-title">التقارير المالية</h1>
-        <p className="section-subtitle">ملخص الأداء المالي</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="section-title">التقارير المالية</h1>
+          <p className="section-subtitle">ملخص الأداء المالي</p>
+        </div>
+        {(currentUser?.role === 'admin' || currentUser?.role === 'owner') && (
+          <button className="btn-primary" onClick={() => setShowExpenseForm(true)}>
+            <Plus className="w-4 h-4" /> إضافة مصروف
+          </button>
+        )}
       </div>
+
+      {/* Expense Form Modal */}
+      {showExpenseForm && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold">إضافة مصروف جديد</h2>
+              <button onClick={() => setShowExpenseForm(false)} className="p-1.5 hover:bg-gray-100 rounded-lg">
+                <X className="w-4 h-4 text-gray-500" />
+              </button>
+            </div>
+            <form onSubmit={handleAddExpense} className="space-y-3">
+              <div>
+                <label className="label">الوصف</label>
+                <input className="input-field" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} required placeholder="وصف المصروف" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="label">المبلغ (ر.س)</label>
+                  <input type="number" className="input-field" value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} required min="1" placeholder="0" />
+                </div>
+                <div>
+                  <label className="label">التاريخ</label>
+                  <input type="date" className="input-field" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} required />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="label">الفئة</label>
+                  <select className="input-field" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}>
+                    {Object.entries(categoryLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="label">العقار (اختياري)</label>
+                  <select className="input-field" value={form.propertyId} onChange={e => setForm({ ...form, propertyId: e.target.value })}>
+                    <option value="">عام</option>
+                    {myProperties.map(p => <option key={p.id} value={p.id}>{p.propertyName}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button type="submit" className="btn-primary flex-1">إضافة</button>
+                <button type="button" className="btn-secondary flex-1" onClick={() => setShowExpenseForm(false)}>إلغاء</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
@@ -89,6 +171,45 @@ export default function FinancesPage() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Recent Expenses */}
+      <div className="card">
+        <h3 className="font-bold text-gray-800 mb-4">آخر المصروفات</h3>
+        {myExpenses.length === 0 ? (
+          <p className="text-sm text-gray-400 text-center py-6">لا توجد مصروفات مسجّلة</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="table-header">الوصف</th>
+                  <th className="table-header">الفئة</th>
+                  <th className="table-header">التاريخ</th>
+                  <th className="table-header">المبلغ</th>
+                  {(currentUser?.role === 'admin' || currentUser?.role === 'owner') && <th className="table-header">حذف</th>}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {[...myExpenses].sort((a, b) => new Date(b.date || b.createdAt || '').getTime() - new Date(a.date || a.createdAt || '').getTime()).slice(0, 15).map(e => (
+                  <tr key={e.id} className="hover:bg-gray-50">
+                    <td className="table-cell">{e.description}</td>
+                    <td className="table-cell"><span className="badge badge-blue">{categoryLabels[e.category] ?? e.category}</span></td>
+                    <td className="table-cell text-gray-500">{e.date || '—'}</td>
+                    <td className="table-cell font-semibold text-red-600">{e.amount.toLocaleString()} ر</td>
+                    {(currentUser?.role === 'admin' || currentUser?.role === 'owner') && (
+                      <td className="table-cell">
+                        <button onClick={() => deleteExpense(e.id)} className="p-1.5 hover:bg-red-50 rounded text-gray-400 hover:text-red-500 transition-colors" title="حذف">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       <div className="card">

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useStore, generateId } from '../../data/store';
-import { Plus, Edit } from 'lucide-react';
+import { Plus, Edit, Trash2 } from 'lucide-react';
 import type { User as UserType } from '../../types';
 
 const roleLabels: Record<string, string> = {
@@ -13,10 +13,11 @@ const roleColors: Record<string, string> = {
 };
 
 export default function UsersPage() {
-  const { users, addUser, updateUser } = useStore();
+  const { users, currentUser, addUser, updateUser, deleteUser } = useStore();
   const [showForm, setShowForm] = useState(false);
   const [filterRole, setFilterRole] = useState('all');
   const [editing, setEditing] = useState<UserType | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
   const filtered = filterRole === 'all' ? users : users.filter(u => u.role === filterRole);
 
@@ -38,12 +39,20 @@ export default function UsersPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editing) {
-      updateUser(editing.id, { ...form, role: form.role as UserType['role'] });
+      const update: Partial<UserType> = { ...form, role: form.role as UserType['role'] };
+      if (!form.password) delete (update as Partial<UserType> & { password?: string }).password;
+      updateUser(editing.id, update);
     } else {
       addUser({ ...form, role: form.role as UserType['role'], id: generateId(), createdAt: new Date().toISOString() });
     }
     setShowForm(false);
     resetForm();
+  };
+
+  const handleDelete = (id: string) => {
+    if (id === currentUser?.id) return;
+    deleteUser(id);
+    setConfirmDelete(null);
   };
 
   return (
@@ -108,6 +117,22 @@ export default function UsersPage() {
         </div>
       )}
 
+      {confirmDelete && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl text-center">
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Trash2 className="w-6 h-6 text-red-500" />
+            </div>
+            <h3 className="font-bold text-gray-800 mb-2">تأكيد الحذف</h3>
+            <p className="text-sm text-gray-500 mb-5">هل أنت متأكد من حذف هذا المستخدم؟ لا يمكن التراجع عن هذا الإجراء.</p>
+            <div className="flex gap-3">
+              <button className="flex-1 bg-red-500 text-white py-2 rounded-xl font-medium hover:bg-red-600 transition-colors" onClick={() => handleDelete(confirmDelete)}>حذف</button>
+              <button className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-xl font-medium hover:bg-gray-200 transition-colors" onClick={() => setConfirmDelete(null)}>إلغاء</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
         <table className="w-full">
           <thead>
@@ -127,6 +152,7 @@ export default function UsersPage() {
                   <div className="flex items-center gap-2">
                     <div className="w-7 h-7 bg-yellow-500 rounded-full flex items-center justify-center text-white text-xs font-bold">{u.name[0]}</div>
                     <span className="font-medium">{u.name}</span>
+                    {u.id === currentUser?.id && <span className="badge badge-blue text-xs">أنت</span>}
                   </div>
                 </td>
                 <td className="table-cell text-gray-500">{u.email}</td>
@@ -136,7 +162,12 @@ export default function UsersPage() {
                   <span className={`badge ${u.isActive ? 'badge-green' : 'badge-gray'}`}>{u.isActive ? 'نشط' : 'معطّل'}</span>
                 </td>
                 <td className="table-cell">
-                  <button onClick={() => openEdit(u)} className="p-1.5 hover:bg-gray-100 rounded text-gray-500"><Edit className="w-3.5 h-3.5" /></button>
+                  <div className="flex items-center gap-1">
+                    <button onClick={() => openEdit(u)} className="p-1.5 hover:bg-gray-100 rounded text-gray-500" title="تعديل"><Edit className="w-3.5 h-3.5" /></button>
+                    {u.id !== currentUser?.id && (
+                      <button onClick={() => setConfirmDelete(u.id)} className="p-1.5 hover:bg-red-50 rounded text-gray-400 hover:text-red-500 transition-colors" title="حذف"><Trash2 className="w-3.5 h-3.5" /></button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
