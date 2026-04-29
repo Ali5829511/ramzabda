@@ -31,6 +31,7 @@ import {
   Users,
   BarChart3,
   LogOut,
+  FilePlus2,
   ChevronLeft,
   Menu,
   Settings,
@@ -41,11 +42,16 @@ import {
   Megaphone,
   MessageSquare,
   Link2,
+  CheckSquare,
+  CalendarDays,
+  TrendingDown,
+  Receipt,
+  LineChart,
 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 
 const LOGO_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663538106461/mVj998sunPYSva3VMbB5zS/ramz-logo_a0de6d1f.png";
 
@@ -56,9 +62,27 @@ const menuGroups = [
       { icon: LayoutDashboard, label: "لوحة التحكم", path: "/" },
       { icon: Building2, label: "العقارات", path: "/properties" },
       { icon: Home, label: "الوحدات", path: "/units" },
+      { icon: Home, label: "العقارات الشاغرة", path: "/vacant-properties" },
       { icon: FileText, label: "العقود", path: "/contracts" },
       { icon: CreditCard, label: "الدفعات المالية", path: "/payments" },
       { icon: Wrench, label: "الصيانة", path: "/maintenance" },
+    ],
+  },
+  {
+    label: "العمليات",
+    items: [
+      { icon: CheckSquare, label: "المهام والمتابعة", path: "/tasks" },
+      { icon: CalendarDays, label: "المواعيد والتقويم", path: "/appointments" },
+      { icon: TrendingDown, label: "المصروفات والتكاليف", path: "/expenses" },
+      { icon: Receipt, label: "الفواتير", path: "/invoices" },
+    ],
+  },
+  {
+    label: "التقارير",
+    items: [
+      { icon: LineChart, label: "التحليلات المتقدمة", path: "/analytics" },
+      { icon: BarChart3, label: "التقارير", path: "/reports" },
+      { icon: FilePlus2, label: "قوالب الوثائق", path: "/document-templates" },
     ],
   },
   {
@@ -77,7 +101,12 @@ const menuGroups = [
       { icon: Megaphone, label: "التسويق العقاري", path: "/marketing" },
       { icon: MessageSquare, label: "التواصل والإشعارات", path: "/communications" },
       { icon: Link2, label: "تكامل إيجار", path: "/ejar" },
-      { icon: BarChart3, label: "التقارير", path: "/reports" },
+    ],
+  },
+  {
+    label: "النظام",
+    items: [
+      { icon: Settings, label: "الإعدادات", path: "/settings" },
     ],
   },
 ];
@@ -97,10 +126,23 @@ export default function DashboardLayout({
     return saved ? parseInt(saved, 10) : DEFAULT_WIDTH;
   });
   const { loading, user } = useAuth();
+  const [loginLoading, setLoginLoading] = useState(false);
 
   useEffect(() => {
     localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
   }, [sidebarWidth]);
+
+  const handleLocalLogin = async () => {
+    setLoginLoading(true);
+    try {
+      const res = await fetch("/api/auth/local-login", { method: "POST" });
+      if (res.ok) {
+        window.location.reload();
+      }
+    } catch {
+      setLoginLoading(false);
+    }
+  };
 
   if (loading) {
     return <DashboardLayoutSkeleton />;
@@ -119,11 +161,12 @@ export default function DashboardLayout({
             </p>
           </div>
           <Button
-            onClick={() => { window.location.href = getLoginUrl(); }}
+            onClick={handleLocalLogin}
+            disabled={loginLoading}
             size="lg"
             className="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-base shadow-lg"
           >
-            تسجيل الدخول
+            {loginLoading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
           </Button>
         </div>
       </div>

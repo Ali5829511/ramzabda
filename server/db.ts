@@ -1,5 +1,7 @@
 import { eq, like, desc, count, and, sql, or, inArray } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/mysql2";
+import { drizzle as drizzleMySql } from "drizzle-orm/mysql2";
+import { drizzle as drizzlePg } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
 import {
   users, InsertUser,
   properties, InsertProperty,
@@ -19,12 +21,20 @@ import {
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
-let _db: ReturnType<typeof drizzle> | null = null;
+let _db: any = null;
+let _isPostgres = false;
 
 export async function getDb() {
-  if (!_db && process.env.DATABASE_URL) {
+  const connectionString = process.env.DATABASE_URL;
+  if (!_db && connectionString) {
     try {
-      _db = drizzle(process.env.DATABASE_URL);
+      _isPostgres = connectionString.startsWith("postgres://") || connectionString.startsWith("postgresql://");
+      if (_isPostgres) {
+        const pool = new Pool({ connectionString, ssl: { rejectUnauthorized: false } });
+        _db = drizzlePg(pool);
+      } else {
+        _db = drizzleMySql(connectionString);
+      }
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;
@@ -63,7 +73,14 @@ export async function upsertUser(user: InsertUser): Promise<void> {
   if (!values.lastSignedIn) values.lastSignedIn = new Date();
   if (Object.keys(updateSet).length === 0) updateSet.lastSignedIn = new Date();
 
-  await db.insert(users).values(values).onDuplicateKeyUpdate({ set: updateSet });
+  if (_isPostgres) {
+    await (db as any)
+      .insert(users as any)
+      .values(values)
+      .onConflictDoUpdate({ target: (users as any).openId, set: updateSet });
+  } else {
+    await db.insert(users).values(values).onDuplicateKeyUpdate({ set: updateSet });
+  }
 }
 
 export async function getUserByOpenId(openId: string) {
@@ -230,6 +247,13 @@ export async function getContracts(search?: string, status?: string, page = 1, l
     ? await db.select({ count: count() }).from(contracts).where(where)
     : await db.select({ count: count() }).from(contracts);
   return { data, total: totalRow?.count ?? 0 };
+}
+
+export async function getContractById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(contracts).where(eq(contracts.id, id)).limit(1);
+  return result[0] ?? null;
 }
 
 export async function getContractsByTenantIdentity(identity: string) {

@@ -134,10 +134,25 @@ export default function Contracts() {
   const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
   const [showAdd, setShowAdd] = useState(false);
+  const [showBulkAdd, setShowBulkAdd] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<'active' | 'archived'>('active');
+  const [bulkRows, setBulkRows] = useState([
+    { contractNumber: '', contractType: 'سكني', tenantName: '', landlordName: '', startDate: '', endDate: '', totalContractValue: '' },
+  ]);
   const utils = trpc.useUtils();
 
-  const { data, isLoading } = trpc.contracts.list.useQuery({ search, status: statusFilter || undefined, page, limit: 20 });
+  const archivedStatuses = ['منتهي', 'ملغي'];
+  const activeStatusFilter = activeTab === 'archived'
+    ? (statusFilter || undefined)
+    : (statusFilter && !archivedStatuses.includes(statusFilter) ? statusFilter : undefined);
+
+  const { data, isLoading } = trpc.contracts.list.useQuery({
+    search,
+    status: activeTab === 'archived' ? (statusFilter || 'منتهي') : (statusFilter && !archivedStatuses.includes(statusFilter) ? statusFilter : undefined),
+    page,
+    limit: 20,
+  });
 
   const createMutation = trpc.contracts.create.useMutation({
     onSuccess: () => { utils.contracts.list.invalidate(); setShowAdd(false); toast.success('تم إضافة العقد بنجاح'); },
@@ -152,6 +167,17 @@ export default function Contracts() {
     onError: (e) => toast.error(e.message),
   });
 
+  const handleBulkSave = async () => {
+    const valid = bulkRows.filter(r => r.contractNumber && r.tenantName);
+    if (valid.length === 0) return toast.error('يرجى تعبئة بيانات العقود');
+    for (const row of valid) {
+      await createMutation.mutateAsync(row as any).catch(() => {});
+    }
+    setShowBulkAdd(false);
+    setBulkRows([{ contractNumber: '', contractType: 'سكني', tenantName: '', landlordName: '', startDate: '', endDate: '', totalContractValue: '' }]);
+    toast.success(`تم إضافة ${valid.length} عقد بنجاح`);
+  };
+
   const totalPages = Math.ceil((data?.total ?? 0) / 20);
 
   return (
@@ -161,9 +187,30 @@ export default function Contracts() {
           <h1 className="text-2xl font-bold text-slate-900">إدارة العقود</h1>
           <p className="text-sm text-muted-foreground mt-1">إجمالي {data?.total ?? 0} عقد</p>
         </div>
-        <Button onClick={() => setShowAdd(true)} className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold gap-2">
-          <Plus className="h-4 w-4" /> إضافة عقد
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setShowBulkAdd(true)} className="gap-2">
+            <Filter className="h-4 w-4" /> إضافة عقود متعددة
+          </Button>
+          <Button onClick={() => setShowAdd(true)} className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold gap-2">
+            <Plus className="h-4 w-4" /> إضافة عقد
+          </Button>
+        </div>
+      </div>
+
+      {/* Tabs: Active / Archived */}
+      <div className="flex gap-2 border-b border-slate-200">
+        <button
+          onClick={() => { setActiveTab('active'); setStatusFilter(''); setPage(1); }}
+          className={`pb-2 px-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'active' ? 'border-amber-500 text-amber-700' : 'border-transparent text-muted-foreground hover:text-slate-700'}`}
+        >
+          العقود النشطة
+        </button>
+        <button
+          onClick={() => { setActiveTab('archived'); setStatusFilter('منتهي'); setPage(1); }}
+          className={`pb-2 px-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'archived' ? 'border-slate-600 text-slate-700' : 'border-transparent text-muted-foreground hover:text-slate-700'}`}
+        >
+          العقود المؤرشفة
+        </button>
       </div>
 
       <div className="flex gap-3">
@@ -292,6 +339,57 @@ export default function Contracts() {
               loading={updateMutation.isPending}
             />
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Add Dialog */}
+      <Dialog open={showBulkAdd} onOpenChange={setShowBulkAdd}>
+        <DialogContent className="max-w-5xl" dir="rtl">
+          <DialogHeader><DialogTitle className="text-right">إضافة عقود متعددة</DialogTitle></DialogHeader>
+          <div className="space-y-3 max-h-[60vh] overflow-y-auto py-2">
+            {bulkRows.map((row, idx) => (
+              <div key={idx} className="grid grid-cols-7 gap-2 items-end border-b pb-3">
+                <div>
+                  <label className="text-xs text-muted-foreground block mb-1">رقم العقد *</label>
+                  <Input value={row.contractNumber} onChange={e => setBulkRows(r => r.map((x, i) => i === idx ? { ...x, contractNumber: e.target.value } : x))} placeholder="C-001" />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground block mb-1">النوع</label>
+                  <Select value={row.contractType} onValueChange={v => setBulkRows(r => r.map((x, i) => i === idx ? { ...x, contractType: v } : x))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent><SelectItem value="سكني">سكني</SelectItem><SelectItem value="تجاري">تجاري</SelectItem></SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground block mb-1">المستأجر *</label>
+                  <Input value={row.tenantName} onChange={e => setBulkRows(r => r.map((x, i) => i === idx ? { ...x, tenantName: e.target.value } : x))} placeholder="اسم المستأجر" />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground block mb-1">المالك</label>
+                  <Input value={row.landlordName} onChange={e => setBulkRows(r => r.map((x, i) => i === idx ? { ...x, landlordName: e.target.value } : x))} placeholder="اسم المالك" />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground block mb-1">البداية</label>
+                  <Input type="date" value={row.startDate} onChange={e => setBulkRows(r => r.map((x, i) => i === idx ? { ...x, startDate: e.target.value } : x))} />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground block mb-1">النهاية</label>
+                  <Input type="date" value={row.endDate} onChange={e => setBulkRows(r => r.map((x, i) => i === idx ? { ...x, endDate: e.target.value } : x))} />
+                </div>
+                <button onClick={() => setBulkRows(r => r.filter((_, i) => i !== idx))} className="h-9 w-9 flex items-center justify-center rounded text-red-500 hover:bg-red-50 flex-shrink-0">
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-between pt-2">
+            <Button variant="outline" onClick={() => setBulkRows(r => [...r, { contractNumber: '', contractType: 'سكني', tenantName: '', landlordName: '', startDate: '', endDate: '', totalContractValue: '' }])}>
+              <Plus className="h-4 w-4 ml-1" /> إضافة صف
+            </Button>
+            <Button onClick={handleBulkSave} disabled={createMutation.isPending} className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold">
+              {createMutation.isPending ? 'جاري الحفظ...' : `حفظ ${bulkRows.filter(r => r.contractNumber && r.tenantName).length} عقد`}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

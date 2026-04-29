@@ -1,5 +1,4 @@
 import { useState } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -205,8 +204,7 @@ export default function DocumentTemplates() {
   };
 
   return (
-    <DashboardLayout>
-      <div className="p-6 space-y-6" dir="rtl">
+    <div className="p-6 space-y-6" dir="rtl">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">قوالب المستندات والإشعارات</h1>
@@ -387,7 +385,6 @@ export default function DocumentTemplates() {
             )}
           </DialogContent>
         </Dialog>
-      </div>
-    </DashboardLayout>
+    </div>
   );
 }
