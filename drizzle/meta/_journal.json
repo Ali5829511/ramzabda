@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1775818825571,
+      "tag": "0000_rich_krista_starr",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1775818961429,
+      "tag": "0001_odd_psynapse",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1775820834427,
+      "tag": "0002_elite_randall_flagg",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1775823224474,
+      "tag": "0003_flawless_the_watchers",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1775823602888,
+      "tag": "0004_swift_krista_starr",
+      "breakpoints": true
+    }
+  ]
+}
